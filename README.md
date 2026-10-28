@@ -47,7 +47,27 @@ Premier lancement, dans un second terminal :
 
 ```bash
 docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py createcachetable
 docker compose exec backend python manage.py createsuperuser
 ```
+
+Tests automatiques du back-end :
+
+```bash
+docker compose exec backend python manage.py test
+```
+
+## API publique
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET  | `/api/company/` | Profil de l'entreprise |
+| GET  | `/api/categories/` | Catégories + nombre de services publiés (non paginé) |
+| GET  | `/api/services/` | Services publiés — `category`, `search`, `featured=true`, `page`, `page_size` |
+| GET  | `/api/services/{slug}/` | Détail d'un service publié |
+| GET  | `/api/testimonials/` | Témoignages publiés — `service` (slug) |
+| POST | `/api/contact/` | Message de contact (5 par heure et par IP) |
+
+Documentation interactive complète : http://localhost:8000/api/docs/
 
 > Les sections « Production » et « Déploiement » seront complétées aux étapes 6 et 7.

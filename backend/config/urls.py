@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from . import views
@@ -15,6 +15,11 @@ urlpatterns = [
     path("api/health/", views.health, name="health"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    # API publique
+    path("api/", include("company.urls")),
+    path("api/", include("services.urls")),
+    path("api/", include("testimonials.urls")),
+    path("api/", include("contact.urls")),
 ]
 
 if settings.DEBUG:

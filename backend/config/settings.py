@@ -85,6 +85,15 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Cache partagé en base : les compteurs de limitation de débit (contact, login)
+# sont ainsi communs à tous les workers Gunicorn. Table créée par `createcachetable`.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
+
 # --- Mots de passe ------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -97,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # --- Langue et fuseau horaire -------------------------------------------------
 
 LANGUAGE_CODE = "fr-fr"
-TIME_ZONE = os.environ.get("DJANGO_TIME_ZONE", "UTC")
+TIME_ZONE = os.environ.get("DJANGO_TIME_ZONE", "Africa/Douala")
 USE_I18N = True
 USE_TZ = True
 
@@ -117,7 +126,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
     # Surchargé par IsAdminUser sur les routes /api/admin/
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "common.pagination.StandardPagination",
     "PAGE_SIZE": 12,
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
