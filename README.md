@@ -57,6 +57,38 @@ Tests automatiques du back-end :
 docker compose exec backend python manage.py test
 ```
 
+### Données de démonstration (développement)
+
+```bash
+docker compose exec backend python manage.py seed_demo          # crée ou recrée la démo
+docker compose exec backend python manage.py seed_demo --reset  # supprime la démo
+```
+
+Crée 3 catégories, 7 services (dont 1 brouillon) avec images, 4 témoignages et 3 messages, tous
+marqués « (démo) ». `--reset` ne supprime **que** ces données : le contenu réel saisi par
+l'administrateur et le profil de l'entreprise ne sont jamais touchés. Refusé si `DJANGO_DEBUG=0`
+(sauf `--force`). À lancer avec `--reset` avant de saisir le vrai contenu.
+
+### Tests de l'API avec Postman
+
+1. Importer `postman/vitrine.postman_collection.json` et `postman/local.postman_environment.json`.
+2. Sélectionner l'environnement **PROCAD - local** et renseigner `admin_username` / `admin_password`
+   (compte staff).
+3. *Settings > General > Working directory* : choisir la racine du dépôt (pour les images de
+   `postman/fixtures/`).
+4. Lancer toute la collection avec le **Collection Runner** (dossiers 00 à 04, dans l'ordre).
+
+Le jeton CSRF est géré automatiquement par les scripts de la collection. Les données créées par
+les tests sont supprimées en fin de dossier ; le profil de l'entreprise n'est pas modifié.
+L'envoi de contact est limité à 5 par heure : au-delà, la collection reçoit un 429.
+
+En ligne de commande (même résultat) :
+
+```bash
+npx newman run postman/vitrine.postman_collection.json -e postman/local.postman_environment.json \
+  --env-var admin_username=MON_COMPTE --env-var admin_password=MON_MOT_DE_PASSE
+```
+
 ## API publique
 
 | Méthode | Route | Description |

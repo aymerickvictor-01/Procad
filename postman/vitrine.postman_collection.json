@@ -1,0 +1,1241 @@
+{
+  "info": {
+    "name": "PROCAD - API vitrine",
+    "description": "Collection de test de l'API PROCAD. Exécuter les dossiers dans l'ordre (Collection Runner).\n\n1. Sélectionner l'environnement « PROCAD - local » et y renseigner admin_username / admin_password.\n2. Le jeton CSRF est géré automatiquement (scripts de la collection).\n3. Les fichiers d'images sont dans postman/fixtures : régler le dossier de travail de Postman sur la racine du dépôt (Settings > General > Working directory).\n\nLes données créées par les tests sont supprimées à la fin de chaque dossier.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Ajoute le jeton CSRF aux requêtes qui modifient des données.",
+          "if (![\"GET\", \"HEAD\", \"OPTIONS\"].includes(pm.request.method)) {",
+          "    const token = pm.collectionVariables.get(\"csrf_token\");",
+          "    if (token) pm.request.headers.upsert({ key: \"X-CSRFToken\", value: token });",
+          "    // En HTTPS, Django contrôle aussi le Referer.",
+          "    pm.request.headers.upsert({ key: \"Referer\", value: pm.variables.get(\"base_url\") + \"/\" });",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Le jeton change à la connexion : on garde toujours la dernière valeur du cookie.",
+          "const csrf = pm.cookies.get(\"csrftoken\");",
+          "if (csrf) pm.collectionVariables.set(\"csrf_token\", csrf);"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "csrf_token",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    },
+    {
+      "key": "service_id",
+      "value": ""
+    },
+    {
+      "key": "service_slug",
+      "value": ""
+    },
+    {
+      "key": "image_id",
+      "value": ""
+    },
+    {
+      "key": "testimonial_id",
+      "value": ""
+    },
+    {
+      "key": "message_id",
+      "value": ""
+    },
+    {
+      "key": "company_slogan",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Auth",
+      "description": "Cookie CSRF, connexion par session, utilisateur connecté.",
+      "item": [
+        {
+          "name": "CSRF - poser le cookie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/auth/csrf/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cookie csrftoken reçu\", () => pm.expect(pm.cookies.get(\"csrftoken\")).to.be.a(\"string\").and.not.empty);",
+                  "pm.test(\"Jeton dans la réponse\", () => pm.expect(pm.response.json().csrfToken).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - non connecté (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/auth/me/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin - sans connexion (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/admin/stats/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - mauvais mot de passe (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"mauvais-mot-de-passe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Message générique\", () => pm.expect(pm.response.json().detail).to.eql(\"Identifiants incorrects.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/auth/login/",
+            "description": "Renseigner admin_username et admin_password dans l'environnement (compte staff).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Utilisateur connecté\", () => pm.expect(pm.response.json().username).to.eql(pm.variables.get(\"admin_username\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - connecté",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/auth/me/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Changer le mot de passe - ancien incorrect (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/auth/change-password/",
+            "description": "Ne modifie rien : l'ancien mot de passe est volontairement faux.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"mauvais-mot-de-passe\",\n  \"new_password\": \"Nouveau-Mot-De-Passe-2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erreur sur old_password\", () => pm.expect(pm.response.json()).to.have.property(\"old_password\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Public",
+      "description": "Routes sans connexion. Seuls les contenus publiés sont visibles.",
+      "item": [
+        {
+          "name": "Entreprise",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/company/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nom présent\", () => pm.expect(pm.response.json().name).to.be.a(\"string\").and.not.empty);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catégories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/categories/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Liste avec service_count\", () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an(\"array\");",
+                  "    json.forEach(c => pm.expect(c).to.have.property(\"service_count\"));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/services/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Réponse paginée\", () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.all.keys(\"count\", \"next\", \"previous\", \"results\");",
+                  "    pm.expect(json.results).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Services - mis en avant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/services/?featured=true"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tous mis en avant\", () => pm.response.json().results.forEach(s => pm.expect(s.is_featured).to.be.true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Services - recherche et page_size",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/services/?search=installation&page_size=2"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"2 résultats maximum\", () => pm.expect(pm.response.json().results.length).to.be.at.most(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service - slug inconnu (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/services/slug-qui-n-existe-pas/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Témoignages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/testimonials/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Réponse paginée\", () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.all.keys(\"count\", \"next\", \"previous\", \"results\");",
+                  "    pm.expect(json.results).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contact - champs manquants (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/contact/",
+            "description": "Limite : 5 envois par heure et par IP (ce test en consomme un).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pas-un-email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erreurs par champ\", () => pm.expect(pm.response.json()).to.include.keys(\"full_name\", \"email\", \"subject\", \"message\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contact - envoi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/contact/",
+            "description": "Limite : 5 envois par heure et par IP. Au-delà : 429 (attendre ou vider le cache).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test Postman\",\n  \"email\": \"postman@demo.example.com\",\n  \"phone\": \"+237 6 00 00 00 00\",\n  \"subject\": \"Message de test Postman\",\n  \"message\": \"Message envoyé par la collection Postman. Il est supprimé dans le dossier 03.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Admin / Services",
+      "description": "Cycle complet : catégorie, service, images, publication, suppression.",
+      "item": [
+        {
+          "name": "Catégorie - créer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/categories/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Catégorie Postman {{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"category_id\", json.id);",
+                  "pm.test(\"Aucun service\", () => pm.expect(json.service_count).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service - créer (brouillon)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/services/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Service Postman {{$timestamp}}\",\n  \"category\": \"{{category_id}}\",\n  \"short_description\": \"Service créé par la collection Postman.\",\n  \"description\": \"Description complète du service de test.\",\n  \"price_label\": \"Sur devis\",\n  \"features\": [\n    \"Point A\",\n    \"Point B\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"service_id\", json.id);",
+                  "pm.collectionVariables.set(\"service_slug\", json.slug);",
+                  "pm.test(\"Brouillon par défaut\", () => pm.expect(json.is_published).to.be.false);",
+                  "pm.test(\"Points forts enregistrés\", () => pm.expect(json.features).to.eql([\"Point A\", \"Point B\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public - brouillon invisible (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/services/{{service_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service - publier et réordonner les points forts",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_published\": true,\n  \"features\": [\n    \"Point B\",\n    \"Point A\",\n    \"Point C\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ordre des points forts\", () => pm.expect(pm.response.json().features).to.eql([\"Point B\", \"Point A\", \"Point C\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public - service publié visible",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/services/{{service_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Points forts publics\", () => pm.expect(pm.response.json().features).to.have.length(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service - image de couverture (multipart)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/",
+            "description": "Fichier relatif au dossier de travail de Postman (racine du dépôt).",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cover_image",
+                  "type": "file",
+                  "src": "postman/fixtures/image-test.png"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"URL relative /media/\", () => pm.expect(pm.response.json().cover_image).to.match(/^\\/media\\/services\\//));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service - fausse image refusée (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cover_image",
+                  "type": "file",
+                  "src": "postman/fixtures/fausse-image.jpg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erreur sur cover_image\", () => pm.expect(pm.response.json()).to.have.property(\"cover_image\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Galerie - ajouter une image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/images/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "postman/fixtures/image-test.png"
+                },
+                {
+                  "key": "alt_text",
+                  "type": "text",
+                  "value": "Image de test"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"image_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Galerie - modifier le texte alternatif",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/images/{{image_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alt_text\": \"Image de test modifiée\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Texte modifié\", () => pm.expect(pm.response.json().alt_text).to.eql(\"Image de test modifiée\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Galerie - supprimer l'image",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/images/{{image_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Services admin - filtre publiés",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/admin/services/?is_published=true&page_size=50"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Réponse paginée\", () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.all.keys(\"count\", \"next\", \"previous\", \"results\");",
+                  "    pm.expect(json.results).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catégorie - suppression refusée (400)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/admin/categories/{{category_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Message explicatif\", () => pm.expect(pm.response.json().detail).to.include(\"Déplacez d'abord\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service - supprimer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/admin/services/{{service_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catégorie - supprimer (vide)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/admin/categories/{{category_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Admin / Témoignages, Messages, Entreprise, Stats",
+      "description": "Ne modifie pas les données réelles.",
+      "item": [
+        {
+          "name": "Témoignage - créer (masqué)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/testimonials/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author_name\": \"Client Postman\",\n  \"content\": \"Témoignage de test.\",\n  \"rating\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"testimonial_id\", json.id);",
+                  "pm.test(\"Masqué par défaut\", () => pm.expect(json.is_published).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Témoignage - note invalide (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/testimonials/{{testimonial_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 9\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Témoignage - publier",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/testimonials/{{testimonial_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_published\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Témoignage - supprimer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/admin/testimonials/{{testimonial_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Messages - retrouver le message Postman",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/admin/messages/?search=Message de test Postman"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Réponse paginée\", () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.all.keys(\"count\", \"next\", \"previous\", \"results\");",
+                  "    pm.expect(json.results).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "const results = pm.response.json().results;",
+                  "pm.test(\"Message reçu, non lu\", () => {",
+                  "    pm.expect(results.length).to.be.above(0);",
+                  "    pm.expect(results[0].is_read).to.be.false;",
+                  "});",
+                  "if (results.length) pm.collectionVariables.set(\"message_id\", results[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Message - marquer lu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/messages/{{message_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_read\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Lu\", () => pm.expect(pm.response.json().is_read).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Message - supprimer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/admin/messages/{{message_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Entreprise - lire",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/admin/company/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"company_slogan\", pm.response.json().slogan);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Entreprise - réenregistrer le même slogan",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/company/",
+            "description": "Renvoie le slogan actuel : vérifie l'écriture sans changer les données.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.request.body.raw = JSON.stringify({ slogan: pm.collectionVariables.get(\"company_slogan\") || \"\" });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Entreprise - URL invalide (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/company/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"facebook_url\": \"pas une url\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tableau de bord - compteurs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/admin/stats/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Compteurs présents\", () => pm.expect(pm.response.json()).to.include.keys(",
+                  "    \"services_published\", \"services_draft\", \"categories\", \"messages_unread\", \"latest_messages\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Fin",
+      "description": "Déconnexion.",
+      "item": [
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/api/auth/logout/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - après déconnexion (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/auth/me/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
