@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router";
 import { errorMessage, fieldErrors } from "../../api/client";
 import { getServices, sendContactMessage } from "../../api/public";
 import Button from "../../components/Button";
-import ContactCard from "../../components/ContactCard";
+import ContactCard, { contactItems } from "../../components/ContactCard";
 import Container from "../../components/Container";
 import Field, { CharCounter, inputClass } from "../../components/form/Field";
 import PageHero from "../../components/PageHero";
@@ -68,6 +68,8 @@ export default function Contact() {
   }
 
   const serviceOptions = services.data?.results ?? [];
+  // Sans coordonnées renseignées, la carte latérale n'apparaît pas : le formulaire prend toute la largeur.
+  const hasContactCard = contactItems(company).length > 0;
 
   return (
     <>
@@ -82,7 +84,9 @@ export default function Contact() {
       />
 
       <section className="py-12 sm:py-16">
-        <Container className="grid items-start gap-10 lg:grid-cols-[1fr_380px] lg:gap-12">
+        <Container
+          className={`grid items-start gap-10 lg:gap-12 ${hasContactCard ? "lg:grid-cols-[1fr_380px]" : "max-w-3xl"}`}
+        >
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card sm:p-8">
             {status.state === "sent" ? (
               <div className="flex flex-col items-center py-10 text-center" role="status">

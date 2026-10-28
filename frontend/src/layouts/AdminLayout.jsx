@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 
 import { getStats } from "../api/admin";
+import { ToastProvider } from "../components/admin/Toast";
 import { useAuth } from "../context/AuthContext";
 import { useCompany } from "../context/CompanyContext";
 
@@ -93,7 +94,9 @@ export default function AdminLayout() {
       .then(setStats)
       .catch(() => {});
   }, []);
-  useEffect(refreshStats, [pathname, refreshStats]);
+  useEffect(() => {
+    refreshStats();
+  }, [pathname, refreshStats]);
 
   return (
     <div className="min-h-dvh bg-gray-50">
@@ -145,7 +148,9 @@ export default function AdminLayout() {
         </header>
 
         <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
-          <Outlet context={{ stats, refreshStats }} />
+          <ToastProvider>
+            <Outlet context={{ stats, refreshStats }} />
+          </ToastProvider>
         </main>
       </div>
     </div>

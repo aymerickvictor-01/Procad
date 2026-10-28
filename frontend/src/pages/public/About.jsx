@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 
 import Button from "../../components/Button";
-import ContactCard from "../../components/ContactCard";
+import ContactCard, { contactItems } from "../../components/ContactCard";
 import Container from "../../components/Container";
 import PageHero from "../../components/PageHero";
 import { Skeleton } from "../../components/States";
@@ -24,7 +24,9 @@ export default function About() {
       />
 
       <section className="py-12 sm:py-16">
-        <Container className="grid items-start gap-10 lg:grid-cols-[1fr_380px] lg:gap-12">
+        <Container
+          className={`grid items-start gap-10 lg:gap-12 ${contactItems(company).length ? "lg:grid-cols-[1fr_380px]" : "max-w-3xl"}`}
+        >
           <div className="min-w-0">
             {company.hero_image && (
               <div className="mb-10 aspect-[16/8] overflow-hidden rounded-2xl border border-gray-200">

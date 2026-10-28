@@ -25,6 +25,14 @@ export function errorMessage(error, fallback = "Une erreur est survenue. Veuille
   return fallback;
 }
 
+// Les erreurs DRF peuvent être imbriquées (ex. liste : { "features": { "0": ["..."] } }).
+const flatten = (value) =>
+  Array.isArray(value)
+    ? value.map(flatten).join(" ")
+    : value && typeof value === "object"
+      ? Object.values(value).map(flatten).join(" ")
+      : String(value);
+
 /** Erreurs de validation par champ renvoyées par DRF : { champ: "message" }. */
 export function fieldErrors(error) {
   const data = error?.response?.status === 400 ? error.response.data : null;
@@ -32,6 +40,6 @@ export function fieldErrors(error) {
   return Object.fromEntries(
     Object.entries(data)
       .filter(([key]) => key !== "detail")
-      .map(([key, value]) => [key, Array.isArray(value) ? value.join(" ") : String(value)]),
+      .map(([key, value]) => [key, flatten(value)]),
   );
 }

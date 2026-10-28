@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 /**
  * Charge des données au montage et quand `deps` changent.
- * Renvoie { data, error, loading, reload }. Une réponse arrivée après un changement
- * de paramètres (ou un démontage) est ignorée.
+ * Renvoie { data, error, loading, reload, setData }. Une réponse arrivée après un changement
+ * de paramètres (ou un démontage) est ignorée. `setData` modifie les données localement
+ * (ex. mise à jour d'une ligne après un PATCH, sans tout recharger).
  */
 export default function useApi(fetcher, deps = []) {
   const [state, setState] = useState({ data: null, error: null, loading: true });
@@ -22,5 +23,9 @@ export default function useApi(fetcher, deps = []) {
   }, [...deps, attempt]);
 
   const reload = useCallback(() => setAttempt((n) => n + 1), []);
-  return { ...state, reload };
+  const setData = useCallback(
+    (update) => setState((previous) => ({ ...previous, data: typeof update === "function" ? update(previous.data) : update })),
+    [],
+  );
+  return { ...state, reload, setData };
 }

@@ -8,7 +8,9 @@ export default function PublicLayout() {
   const { pathname } = useLocation();
 
   // Chaque nouvelle page commence en haut.
-  useEffect(() => window.scrollTo({ top: 0, behavior: "instant" }), [pathname]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
 
   return (
     <div className="flex min-h-dvh flex-col">

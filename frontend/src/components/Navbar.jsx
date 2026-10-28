@@ -47,12 +47,14 @@ export default function Navbar() {
   const location = useLocation();
 
   // Referme le menu mobile à chaque changement de page.
-  useEffect(() => setOpen(false), [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   return (
     <header className="sticky top-0 z-50">
       <TopBar company={company} />
-      <div className="border-b border-white/10 bg-night/85 backdrop-blur-md">
+      <div className="border-b border-white/10 bg-night">
         <Container className="flex h-16 items-center justify-between gap-4 sm:h-[72px]">
           <Logo />
 
@@ -65,9 +67,12 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button to="/contact" size="sm" className="hidden sm:inline-flex">
-              Nous contacter
-            </Button>
+            {/* Masqué par un conteneur : Button impose déjà « inline-flex », qui l'emporterait sur « hidden ». */}
+            <div className="hidden sm:block">
+              <Button to="/contact" size="sm">
+                Nous contacter
+              </Button>
+            </div>
             <button
               type="button"
               className="rounded-lg p-2 text-white transition-colors hover:bg-white/10 lg:hidden"
