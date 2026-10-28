@@ -21,3 +21,17 @@ class TestimonialSerializer(BaseModelSerializer):
         if service is None or not service.is_published:
             return None
         return ServiceRefSerializer(service).data
+
+
+class AdminTestimonialSerializer(BaseModelSerializer):
+    service_title = serializers.CharField(source="service.title", read_only=True, default=None)
+
+    class Meta:
+        model = Testimonial
+        fields = [
+            "id", "author_name", "author_role", "content", "rating", "photo",
+            "service", "service_title", "is_published", "created_at",
+        ]
+        read_only_fields = ["created_at"]
+        # null = retirer la photo
+        extra_kwargs = {"photo": {"allow_null": True}}

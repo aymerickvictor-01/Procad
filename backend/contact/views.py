@@ -1,11 +1,13 @@
 import logging
 
 from drf_spectacular.utils import extend_schema, inline_serializer
-from rest_framework import generics, serializers, status
+from rest_framework import generics, mixins, serializers, status, viewsets
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
-from .serializers import ContactMessageSerializer
+from .models import ContactMessage
+from .serializers import AdminContactMessageSerializer, ContactMessageSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +33,21 @@ class ContactCreateView(generics.CreateAPIView):
         else:
             serializer.save()
         return Response({"detail": SUCCESS_MESSAGE}, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=["Admin - Messages"])
+class AdminContactMessageViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Boîte de réception, du plus récent au plus ancien. PATCH {"is_read": true|false}."""
+
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminContactMessageSerializer
+    http_method_names = ["get", "patch", "delete", "head", "options"]
+    filterset_fields = ["is_read"]
+    search_fields = ["full_name", "email", "subject", "message"]
+    queryset = ContactMessage.objects.select_related("service")

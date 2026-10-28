@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from services.models import Service
+from services.serializers import ServiceRefSerializer
 
 from .models import ContactMessage
 
@@ -23,3 +24,14 @@ class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
         fields = ["full_name", "email", "phone", "subject", "message", "service", "website"]
+
+
+class AdminContactMessageSerializer(serializers.ModelSerializer):
+    """Seul `is_read` est modifiable : le contenu d'un message vient du visiteur."""
+
+    service = ServiceRefSerializer(read_only=True)
+
+    class Meta:
+        model = ContactMessage
+        fields = ["id", "full_name", "email", "phone", "subject", "message", "service", "is_read", "created_at"]
+        read_only_fields = [f for f in fields if f != "is_read"]

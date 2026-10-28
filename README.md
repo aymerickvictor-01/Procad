@@ -83,6 +83,25 @@ du cookie `csrftoken`. Le jeton change après la connexion : toujours relire le 
 
 Codes : **401** = non connecté, **403** = connecté sans les droits (ou jeton CSRF absent).
 
+## API d'administration (comptes staff)
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET | `/api/admin/stats/` | Compteurs du tableau de bord + 5 derniers messages |
+| GET / PUT / PATCH | `/api/admin/company/` | Profil de l'entreprise (multipart pour logo / bannière) |
+| GET / POST | `/api/admin/services/` | Tous les services — filtres `category` (id), `is_published`, `is_featured`, `search` |
+| GET / PUT / PATCH / DELETE | `/api/admin/services/{id}/` | `features` = liste de textes qui remplace l'existante |
+| POST | `/api/admin/services/{id}/images/` | Ajout d'une image à la galerie (multipart) |
+| PATCH / DELETE | `/api/admin/services/{id}/images/{image_id}/` | Texte alternatif, ordre / suppression |
+| GET / POST | `/api/admin/categories/` | Catégories (non paginé) |
+| GET / PUT / PATCH / DELETE | `/api/admin/categories/{id}/` | 400 si des services y sont rattachés |
+| GET / POST | `/api/admin/testimonials/` | Filtres `is_published`, `service` (id) |
+| GET / PUT / PATCH / DELETE | `/api/admin/testimonials/{id}/` | |
+| GET | `/api/admin/messages/` | Du plus récent au plus ancien — filtre `is_read` |
+| GET / PATCH / DELETE | `/api/admin/messages/{id}/` | PATCH limité à `is_read` |
+
+Images : JPEG, PNG ou WebP, 5 Mo maximum. Envoyer `null` (JSON) pour retirer une image.
+
 Documentation interactive complète : http://localhost:8000/api/docs/
 
 > Les sections « Production » et « Déploiement » seront complétées aux étapes 6 et 7.

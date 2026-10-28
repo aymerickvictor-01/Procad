@@ -1,8 +1,10 @@
+from django.db import transaction
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from common.serializers import BaseModelSerializer
 
-from .models import Category, Service, ServiceImage
+from .models import Category, Service, ServiceFeature, ServiceImage
 
 
 class CategorySerializer(BaseModelSerializer):
@@ -50,3 +52,80 @@ class ServiceDetailSerializer(ServiceListSerializer):
 
     class Meta(ServiceListSerializer.Meta):
         fields = ServiceListSerializer.Meta.fields + ["description", "images", "features", "updated_at"]
+
+
+# --- Administration -----------------------------------------------------------
+
+
+class AdminCategorySerializer(BaseModelSerializer):
+    service_count = serializers.SerializerMethodField(help_text="Nombre total de services (tous statuts).")
+
+    class Meta:
+        model = Category
+        fields = ["id", "name", "slug", "description", "display_order", "service_count", "created_at"]
+        read_only_fields = ["created_at"]
+
+    @extend_schema_field(serializers.IntegerField())
+    def get_service_count(self, obj):
+        # Annoté par la vue ; absent juste après une création (0 service).
+        return getattr(obj, "service_count", 0)
+
+
+class FeatureListField(serializers.ListField):
+    """Points forts sous forme de liste de textes, dans l'ordre d'affichage."""
+
+    child = serializers.CharField(max_length=200)
+
+    def to_representation(self, manager):
+        return [feature.label for feature in manager.all()]
+
+
+class AdminServiceImageSerializer(BaseModelSerializer):
+    class Meta:
+        model = ServiceImage
+        fields = ["id", "image", "alt_text", "display_order"]
+
+
+class AdminServiceSerializer(BaseModelSerializer):
+    category_name = serializers.CharField(source="category.name", read_only=True)
+    features = FeatureListField(
+        required=False,
+        help_text="Liste complète des points forts : elle remplace l'existante. Absente = inchangée.",
+    )
+    images = AdminServiceImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Service
+        fields = [
+            "id", "title", "slug", "category", "category_name", "short_description", "description",
+            "cover_image", "price_label", "is_published", "is_featured", "display_order",
+            "features", "images", "created_at", "updated_at",
+        ]
+        read_only_fields = ["created_at", "updated_at"]
+        # null = retirer l'image de couverture
+        extra_kwargs = {"cover_image": {"allow_null": True}}
+
+    @transaction.atomic
+    def create(self, validated_data):
+        features = validated_data.pop("features", None)
+        service = super().create(validated_data)
+        if features is not None:
+            self._set_features(service, features)
+        return service
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        features = validated_data.pop("features", None)
+        service = super().update(instance, validated_data)
+        if features is not None:
+            self._set_features(service, features)
+        return service
+
+    def _set_features(self, service, labels):
+        service.features.all().delete()
+        ServiceFeature.objects.bulk_create(
+            ServiceFeature(service=service, label=label, display_order=index)
+            for index, label in enumerate(labels)
+        )
+        # Vide un éventuel cache prefetch_related pour que la réponse montre la nouvelle liste.
+        getattr(service, "_prefetched_objects_cache", {}).pop("features", None)

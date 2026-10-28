@@ -21,6 +21,12 @@ urlpatterns = [
     path("api/", include("services.urls")),
     path("api/", include("testimonials.urls")),
     path("api/", include("contact.urls")),
+    # API d'administration (comptes staff uniquement)
+    path("api/admin/stats/", views.admin_stats, name="admin-stats"),
+    path("api/admin/", include("company.urls_admin")),
+    path("api/admin/", include("services.urls_admin")),
+    path("api/admin/", include("testimonials.urls_admin")),
+    path("api/admin/", include("contact.urls_admin")),
 ]
 
 if settings.DEBUG:
