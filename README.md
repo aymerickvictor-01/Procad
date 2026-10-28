@@ -69,6 +69,20 @@ marqués « (démo) ». `--reset` ne supprime **que** ces données : le contenu 
 l'administrateur et le profil de l'entreprise ne sont jamais touchés. Refusé si `DJANGO_DEBUG=0`
 (sauf `--force`). À lancer avec `--reset` avant de saisir le vrai contenu.
 
+### Tests de bout en bout (navigateur)
+
+```bash
+node e2e/scenario.mjs
+```
+
+Pilote Microsoft Edge sans interface (aucune dépendance à installer : Node 22 + Edge) et
+déroule 22 parcours réels : connexion, création d'une catégorie puis d'un service avec image
+et points forts, publication, affichage public, envoi d'un message de contact, lecture et
+suppression dans l'admin, témoignage, profil de l'entreprise, mot de passe, session expirée.
+Un compte administrateur temporaire est créé puis supprimé, ainsi que toutes les données de
+test ; le slogan de l'entreprise est restauré. Captures d'écran : `e2e/resultats/`.
+Autre navigateur Chromium : variable `E2E_BROWSER` (chemin de l'exécutable).
+
 ### Tests de l'API avec Postman
 
 1. Importer `postman/vitrine.postman_collection.json` et `postman/local.postman_environment.json`.

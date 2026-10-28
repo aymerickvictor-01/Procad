@@ -8,7 +8,9 @@ class TestimonialsConfig(AppConfig):
 
     def ready(self):
         from common.files import cleanup_files
+        from common.images import optimize_images
 
         from .models import Testimonial
 
         cleanup_files(Testimonial, "photo")
+        optimize_images(Testimonial, "photo")

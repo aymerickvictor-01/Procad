@@ -16,7 +16,7 @@ import useDebounce from "../../hooks/useDebounce";
 import useUrlFilters from "../../hooks/useUrlFilters";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" });
-const selectClass = `${inputClass} py-2.5 sm:w-48`;
+const selectClass = `${inputClass} py-2.5 sm:w-56`;
 
 export function StatusBadge({ published }) {
   return (

@@ -119,6 +119,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Taille maximale d'une image téléversée (logo, couverture, galerie, photo)
 MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024
+# Côté le plus long d'une image après optimisation (les images plus grandes sont réduites)
+IMAGE_MAX_SIDE = 1920
 
 # --- Django REST Framework ----------------------------------------------------
 
