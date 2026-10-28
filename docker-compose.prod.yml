@@ -1,0 +1,76 @@
+# Environnement de PRODUCTION : db, backend (Gunicorn), web (Nginx + React compilé), certbot.
+#
+# Sur le serveur (fichier .env de production) :
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Test de la production en local, sans toucher à l'environnement de développement
+# (projet Docker séparé, fichier .env.prod) : voir le README, section « Production ».
+
+x-env-file: &env-file ${PROCAD_ENV_FILE:-.env}
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    env_file: *env-file
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # aucun "ports:" : la base n'est pas accessible depuis l'extérieur
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: *env-file
+    volumes:
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    # Migrations, table de cache et fichiers statiques à chaque démarrage, puis Gunicorn.
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py createcachetable &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+             --timeout 60 --access-logfile - --error-logfile -"
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      NGINX_SERVER_NAMES: ${NGINX_SERVER_NAMES:-localhost}
+      NGINX_CERT_NAME: ${NGINX_CERT_NAME:-localhost}
+    volumes:
+      # Gabarit actif : http-only (phase 1) ou https (phase 2), choisi par NGINX_CONFIG.
+      - ./nginx/templates/${NGINX_CONFIG:-http-only}.conf:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx/snippets:/etc/nginx/snippets:ro
+      - static_data:/var/www/static:ro
+      - media_data:/var/www/media:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+
+  # Lancé à la demande (obtention et renouvellement du certificat), jamais par « up ».
+  certbot:
+    image: certbot/certbot
+    profiles: ["certbot"]
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_conf:/etc/letsencrypt
+
+volumes:
+  pgdata:
+  static_data:
+  media_data:
+  certbot_www:
+  certbot_conf:

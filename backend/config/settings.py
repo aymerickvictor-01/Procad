@@ -156,6 +156,9 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    # Redirection HTTP -> HTTPS et en-tête HSTS : gérés par Nginx (nginx/templates/https.conf,
+    # nginx/snippets/security-headers.conf), HSTS n'étant activé qu'après validation du HTTPS.
+    SILENCED_SYSTEM_CHECKS = ["security.W004", "security.W008"]
 
 # --- Journaux -----------------------------------------------------------------
 

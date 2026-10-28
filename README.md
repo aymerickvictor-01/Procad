@@ -16,9 +16,10 @@ Application web qui présente les services de PROCAD et permet à l'entreprise d
 ```
 backend/     API Django (accounts, company, services, testimonials, contact)
 frontend/    Application React (Vite)
-nginx/       Configurations Nginx (conf.d/ = active, templates/ = HTTP seul / HTTPS)
+nginx/       Production : templates/ (http-only.conf, https.conf) et snippets/ (routes communes)
 postman/     Collection et environnement Postman
-docs/        Document de conception, schémas
+e2e/         Tests de bout en bout dans le navigateur
+docs/        Document de conception, logo (docs/brand/)
 ```
 
 ## Prérequis
@@ -150,4 +151,37 @@ Images : JPEG, PNG ou WebP, 5 Mo maximum. Envoyer `null` (JSON) pour retirer une
 
 Documentation interactive complète : http://localhost:8000/api/docs/
 
-> Les sections « Production » et « Déploiement » seront complétées aux étapes 6 et 7.
+
+
+## Production
+
+La production utilise `docker-compose.prod.yml` : PostgreSQL (aucun port ouvert), Django servi
+par Gunicorn, Nginx (React compilé, relais `/api/` et `/django-admin/`, fichiers `/static/` et
+`/media/`) et Certbot pour le certificat HTTPS. Au démarrage, le conteneur `backend` applique les
+migrations, crée la table de cache et collecte les fichiers statiques.
+
+### Tester la production en local (http://localhost)
+
+Projet Docker séparé (`procad-prod`) : l'environnement de développement n'est pas touché.
+
+```bash
+cp .env.prod.example .env.prod   # puis : DJANGO_DEBUG=0, hôtes localhost, NGINX_CONFIG=http-only
+export PROCAD_ENV_FILE=.env.prod # PowerShell : $env:PROCAD_ENV_FILE=".env.prod"
+docker compose -p procad-prod -f docker-compose.prod.yml --env-file .env.prod up -d --build
+docker compose -p procad-prod -f docker-compose.prod.yml --env-file .env.prod exec backend python manage.py createsuperuser
+docker compose -p procad-prod -f docker-compose.prod.yml --env-file .env.prod down   # arrêt (données conservées)
+```
+
+### Configuration Nginx
+
+Le gabarit actif est choisi par `NGINX_CONFIG` dans le `.env` : `http-only` (avant le certificat)
+puis `https`. Les noms de domaine (`NGINX_SERVER_NAMES`, `NGINX_CERT_NAME`) sont insérés au
+démarrage du conteneur `web` : aucun fichier à modifier à la main. Passer en HTTPS :
+
+```bash
+# après avoir obtenu le certificat (section 12.4 du document de conception)
+sed -i 's/^NGINX_CONFIG=.*/NGINX_CONFIG=https/' .env
+docker compose -f docker-compose.prod.yml up -d web
+```
+
+Le déploiement sur le serveur (DNS, certificat, renouvellement, sauvegardes) est décrit à l'étape 7.
