@@ -39,7 +39,9 @@ docker compose up --build
 | http://localhost:5173            | Site (React)                |
 | http://localhost:8000/api/docs/  | Documentation de l'API      |
 | http://localhost:8000/django-admin/ | Admin Django (secours)   |
-| http://localhost:5050            | pgAdmin                     |
+| http://localhost:5050            | pgAdmin (identifiants : `PGADMIN_EMAIL` / `PGADMIN_PASSWORD`) |
+| http://localhost:8000/api/health/ | État de l'API et de la base |
+| `localhost:5433`                 | PostgreSQL depuis le PC (5433 pour ne pas entrer en conflit avec un PostgreSQL local) |
 
 Premier lancement, dans un second terminal :
 
