@@ -122,7 +122,7 @@ export default function AdminServices() {
       </div>
 
       {services.loading && !services.data ? (
-        <div className="space-y-2 rounded-2xl border border-gray-200 bg-white p-4">
+        <div className="space-y-2 rounded-xl border border-gray-200 bg-white p-4">
           {[1, 2, 3, 4].map((n) => (
             <Skeleton key={n} className="h-14 w-full" />
           ))}
@@ -137,7 +137,7 @@ export default function AdminServices() {
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-[14px]">
                 <thead className="border-b border-gray-200 bg-gray-50 text-[12px] font-semibold tracking-wide text-gray-500 uppercase">

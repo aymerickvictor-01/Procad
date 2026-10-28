@@ -11,7 +11,7 @@ export default function Pagination({ page, count, pageSize = 12, onChange }) {
   const total = Math.ceil(count / pageSize);
   if (total <= 1) return null;
 
-  const base = "grid h-10 min-w-10 place-items-center rounded-full px-3 text-sm font-semibold transition-colors";
+  const base = "grid h-10 min-w-10 place-items-center rounded-lg px-3 text-sm font-semibold transition-colors";
   return (
     <nav aria-label="Pagination" className="mt-12 flex items-center justify-center gap-1.5">
       <button

@@ -27,7 +27,7 @@ export default function SocialIcons({ company, className = "" }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${LABELS[network]} (nouvel onglet)`}
-          className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/5 text-ink-secondary transition hover:border-primary/40 hover:bg-primary/15 hover:text-white"
+          className="grid size-10 place-items-center rounded-lg border border-white/15 text-ink-secondary transition hover:border-white/40 hover:text-white"
         >
           <svg viewBox="0 0 24 24" className="size-[18px]" fill="currentColor" aria-hidden="true">
             <path d={PATHS[network]} />

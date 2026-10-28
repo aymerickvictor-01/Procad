@@ -202,7 +202,7 @@ export default function AdminTestimonials() {
             type="button"
             aria-pressed={published === value}
             onClick={() => update({ is_published: value, page: null })}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
               published === value ? "bg-gray-900 text-white" : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
             }`}
           >
@@ -214,7 +214,7 @@ export default function AdminTestimonials() {
       {testimonials.loading && !testimonials.data ? (
         <div className="grid gap-4 md:grid-cols-2">
           {[1, 2].map((n) => (
-            <Skeleton key={n} className="h-44 rounded-2xl" />
+            <Skeleton key={n} className="h-44 rounded-xl" />
           ))}
         </div>
       ) : testimonials.error ? (
@@ -229,7 +229,7 @@ export default function AdminTestimonials() {
         <>
           <div className="grid gap-4 md:grid-cols-2">
             {testimonials.data.results.map((testimonial) => (
-              <article key={testimonial.id} className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-card">
+              <article key={testimonial.id} className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 shadow-card">
                 <div className="flex items-start gap-3">
                   {testimonial.photo ? (
                     <img src={testimonial.photo} alt="" className="size-11 rounded-full object-cover" />

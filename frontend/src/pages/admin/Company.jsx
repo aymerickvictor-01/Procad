@@ -104,7 +104,7 @@ export default function AdminCompany() {
   if (!values) {
     return (
       <AdminPage title="Entreprise">
-        <Skeleton className="h-[480px] w-full rounded-2xl" />
+        <Skeleton className="h-[480px] w-full rounded-xl" />
       </AdminPage>
     );
   }
@@ -123,7 +123,7 @@ export default function AdminCompany() {
 
   return (
     <AdminPage title="Entreprise" description="Informations affichées sur l'ensemble du site : en-tête, pied de page, accueil, À propos, Contact.">
-      <form noValidate onSubmit={submit} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-card sm:p-8">
+      <form noValidate onSubmit={submit} className="rounded-xl border border-gray-200 bg-white p-5 shadow-card sm:p-8">
         <Section title="Identité" description="Le logo remplace le logotype provisoire dans l'en-tête.">
           {text("name", "Nom de l'entreprise")}
           {text("slogan", "Slogan", { hint: "Affiché sous le nom, sur la page d'accueil." })}

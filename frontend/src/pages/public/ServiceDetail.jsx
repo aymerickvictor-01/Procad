@@ -24,15 +24,15 @@ function Gallery({ service }) {
 
   if (!current) {
     return (
-      <div className="grid aspect-[16/10] place-items-center rounded-2xl bg-linear-to-br from-night to-night-subtle">
-        <Layers className="size-14 text-primary-soft/50" aria-hidden="true" />
+      <div className="grid aspect-[16/10] place-items-center rounded-xl bg-night">
+        <Layers className="size-14 text-ink-muted" aria-hidden="true" />
       </div>
     );
   }
 
   return (
     <div>
-      <div className="aspect-[16/10] overflow-hidden rounded-2xl border border-gray-200 bg-gray-100">
+      <div className="aspect-[16/10] overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
         <img src={current.image} alt={current.alt_text || service.title} className="size-full object-cover" />
       </div>
       {images.length > 1 && (
@@ -59,7 +59,7 @@ function Gallery({ service }) {
 
 function ContactPanel({ service, company }) {
   return (
-    <aside className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card lg:sticky lg:top-28">
+    <aside className="rounded-xl border border-gray-200 bg-white p-6 shadow-card lg:sticky lg:top-28">
       {service.price_label && (
         <>
           <p className="text-[12px] font-semibold tracking-[0.08em] text-gray-500 uppercase">Prix indicatif</p>
@@ -85,12 +85,12 @@ function DetailSkeleton() {
   return (
     <Container className="grid gap-10 py-14 lg:grid-cols-[1fr_340px]" aria-hidden="true">
       <div className="space-y-4">
-        <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
+        <Skeleton className="aspect-[16/10] w-full rounded-xl" />
         <Skeleton className="h-5 w-2/3" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-5/6" />
       </div>
-      <Skeleton className="h-64 rounded-2xl" />
+      <Skeleton className="h-64 rounded-xl" />
     </Container>
   );
 }
@@ -155,7 +155,7 @@ export default function ServiceDetail() {
                 </div>
 
                 {service.features.length > 0 && (
-                  <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50 p-6 sm:p-8">
+                  <div className="mt-10 rounded-xl border border-gray-200 bg-gray-50 p-6 sm:p-8">
                     <h2 className="text-xl font-bold tracking-[-0.01em] text-gray-900">Points forts</h2>
                     <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                       {service.features.map((feature) => (

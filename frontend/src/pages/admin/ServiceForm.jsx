@@ -55,7 +55,7 @@ function validate(values) {
 
 function Card({ title, description, children }) {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-card sm:p-6">
+    <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-card sm:p-6">
       {title && <h2 className="font-display text-lg font-semibold text-gray-900">{title}</h2>}
       {description && <p className="mt-0.5 text-sm text-gray-500">{description}</p>}
       <div className={title ? "mt-5" : ""}>{children}</div>
@@ -341,7 +341,7 @@ export default function ServiceForm() {
   if (editing && loaded.loading) {
     return (
       <AdminPage title="Modifier le service">
-        <Skeleton className="h-96 w-full rounded-2xl" />
+        <Skeleton className="h-96 w-full rounded-xl" />
       </AdminPage>
     );
   }

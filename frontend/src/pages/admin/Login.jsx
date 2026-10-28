@@ -1,10 +1,12 @@
-import { AlertCircle, ArrowLeft, Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { AlertCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 
 import { errorMessage } from "../../api/client";
 import Button from "../../components/Button";
 import Field, { inputClass } from "../../components/form/Field";
+import Logo from "../../components/Logo";
+import { Eyebrow } from "../../components/SectionHeader";
 import { useAuth } from "../../context/AuthContext";
 import { useCompany } from "../../context/CompanyContext";
 import { FullPageLoader } from "../../routes/ProtectedRoute";
@@ -55,17 +57,13 @@ export default function AdminLogin() {
       <meta name="robots" content="noindex" />
 
       {/* Panneau de marque */}
-      <div className="relative hidden overflow-hidden bg-night p-12 text-ink lg:flex lg:flex-col lg:justify-between">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <div className="bg-dots absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
-          <div className="absolute top-1/3 left-1/2 h-[480px] w-[640px] -translate-x-1/2 rounded-full bg-primary/25 blur-[130px]" />
-        </div>
-        <Link to="/" className="relative font-display text-2xl font-bold tracking-[-0.02em] text-white">
-          {company.name}
-        </Link>
+      <div className="relative hidden overflow-hidden border-r-4 border-accent bg-night p-12 text-ink lg:flex lg:flex-col lg:justify-between">
+        <div aria-hidden="true" className="bg-blueprint absolute inset-0" />
+        <Logo framed className="relative self-start" imageClassName="h-16" />
         <div className="relative">
-          <p className="font-display text-4xl leading-tight font-bold tracking-[-0.03em] text-white">
-            Gérez votre site <span className="text-gradient">en toute autonomie.</span>
+          <Eyebrow dark>Espace d'administration</Eyebrow>
+          <p className="mt-4 font-display text-4xl leading-tight font-bold tracking-[-0.03em] text-white">
+            Gérez votre site en toute autonomie.
           </p>
           <p className="mt-4 max-w-md text-ink-secondary">
             Services, catégories, témoignages, messages et informations de l'entreprise : tout se modifie ici, sans
@@ -81,10 +79,8 @@ export default function AdminLogin() {
           <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900">
             <ArrowLeft className="size-4" aria-hidden="true" /> Retour au site
           </Link>
-          <span className="mt-8 grid size-12 place-items-center rounded-2xl bg-linear-to-br from-primary to-primary-soft text-white shadow-glow">
-            <LockKeyhole className="size-6" aria-hidden="true" />
-          </span>
-          <h1 className="mt-5 text-3xl font-bold tracking-[-0.02em] text-gray-900">Connexion</h1>
+          <Logo className="mt-8 lg:hidden" imageClassName="h-14" />
+          <h1 className="mt-8 text-3xl font-bold tracking-[-0.02em] text-gray-900">Connexion</h1>
           <p className="mt-2 text-gray-600">Accédez à l'espace d'administration.</p>
 
           <form noValidate onSubmit={handleSubmit} className="mt-8 space-y-5">

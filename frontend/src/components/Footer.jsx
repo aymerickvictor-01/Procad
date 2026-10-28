@@ -15,12 +15,11 @@ export default function Footer() {
   const address = [company.address, company.city, company.country].filter(Boolean).join(", ");
 
   return (
-    <footer className="relative overflow-hidden bg-night text-ink-tertiary">
-      <div className="divider-glow" />
+    <footer className="relative overflow-hidden border-t-4 border-accent bg-night text-ink-tertiary">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr_1fr]">
         <div>
-          <Logo />
-          {company.slogan && <p className="mt-4 max-w-xs text-[15px] leading-relaxed">{company.slogan}</p>}
+          <Logo framed imageClassName="h-14" />
+          {company.slogan && <p className="mt-5 max-w-xs text-[15px] leading-relaxed">{company.slogan}</p>}
           <SocialIcons company={company} className="mt-6" />
         </div>
 
@@ -47,20 +46,20 @@ export default function Footer() {
           <ul className="mt-4 space-y-3 text-[15px]">
             {address && (
               <li className="flex gap-2.5">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-primary-soft" aria-hidden="true" /> {address}
+                <MapPin className="mt-0.5 size-4 shrink-0 text-ink-tertiary" aria-hidden="true" /> {address}
               </li>
             )}
             {company.phone && (
               <li>
                 <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="flex gap-2.5 hover:text-white">
-                  <Phone className="mt-0.5 size-4 shrink-0 text-primary-soft" aria-hidden="true" /> {company.phone}
+                  <Phone className="mt-0.5 size-4 shrink-0 text-ink-tertiary" aria-hidden="true" /> {company.phone}
                 </a>
               </li>
             )}
             {company.email && (
               <li>
                 <a href={`mailto:${company.email}`} className="flex gap-2.5 break-all hover:text-white">
-                  <Mail className="mt-0.5 size-4 shrink-0 text-primary-soft" aria-hidden="true" /> {company.email}
+                  <Mail className="mt-0.5 size-4 shrink-0 text-ink-tertiary" aria-hidden="true" /> {company.email}
                 </a>
               </li>
             )}
@@ -78,7 +77,7 @@ export default function Footer() {
           <div>
             <FooterTitle>Horaires</FooterTitle>
             <p className="mt-4 flex gap-2.5 text-[15px] leading-relaxed whitespace-pre-line">
-              <Clock className="mt-1 size-4 shrink-0 text-primary-soft" aria-hidden="true" />
+              <Clock className="mt-1 size-4 shrink-0 text-ink-tertiary" aria-hidden="true" />
               {company.opening_hours}
             </p>
           </div>

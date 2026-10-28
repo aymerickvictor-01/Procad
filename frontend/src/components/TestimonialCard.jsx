@@ -1,4 +1,4 @@
-import { Quote, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 export function Stars({ rating, className = "" }) {
   if (!rating) return null;
@@ -25,8 +25,7 @@ function initials(name) {
 
 export default function TestimonialCard({ testimonial }) {
   return (
-    <figure className="relative flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-card sm:p-7">
-      <Quote className="absolute top-6 right-6 size-8 text-primary/10" aria-hidden="true" />
+    <figure className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-card sm:p-7">
       <Stars rating={testimonial.rating} />
       <blockquote className="mt-4 flex-1 text-[16px] leading-relaxed text-gray-700">
         « {testimonial.content} »
@@ -37,7 +36,7 @@ export default function TestimonialCard({ testimonial }) {
         ) : (
           <span
             aria-hidden="true"
-            className="grid size-11 place-items-center rounded-full bg-linear-to-br from-primary to-primary-soft text-sm font-bold text-white"
+            className="grid size-11 place-items-center rounded-full bg-primary text-sm font-bold text-white"
           >
             {initials(testimonial.author_name)}
           </span>

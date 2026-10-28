@@ -29,7 +29,7 @@ export default function About() {
         >
           <div className="min-w-0">
             {company.hero_image && (
-              <div className="mb-10 aspect-[16/8] overflow-hidden rounded-2xl border border-gray-200">
+              <div className="mb-10 aspect-[16/8] overflow-hidden rounded-xl border border-gray-200">
                 <img src={company.hero_image} alt={company.name} className="size-full object-cover" />
               </div>
             )}

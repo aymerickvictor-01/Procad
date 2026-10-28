@@ -17,7 +17,7 @@ import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { getStats } from "../api/admin";
 import { ToastProvider } from "../components/admin/Toast";
 import { useAuth } from "../context/AuthContext";
-import { useCompany } from "../context/CompanyContext";
+import Logo from "../components/Logo";
 
 const NAV = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, end: true },
@@ -30,16 +30,14 @@ const NAV = [
 ];
 
 function Sidebar({ stats, onNavigate }) {
-  const { company } = useCompany();
   return (
     <div className="flex h-full flex-col bg-night text-ink">
-      <Link to="/admin" onClick={onNavigate} className="flex h-16 items-center gap-2.5 border-b border-white/10 px-5">
-        <span className="grid size-8 place-items-center rounded-lg bg-linear-to-br from-primary to-primary-soft font-display font-bold text-white">
-          {company.name.charAt(0)}
-        </span>
-        <span className="font-display text-lg font-bold tracking-[-0.02em] text-white">{company.name}</span>
-        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-ink-tertiary">Admin</span>
-      </Link>
+      <div className="border-b border-white/10 p-4" onClick={onNavigate}>
+        <Logo framed to="/admin" imageClassName="h-12" className="w-full justify-center" />
+        <p className="mt-3 text-center text-[11px] font-semibold tracking-[0.12em] text-ink-muted uppercase">
+          Administration
+        </p>
+      </div>
       <nav aria-label="Administration" className="flex-1 space-y-1 overflow-y-auto p-3">
         {NAV.map(({ to, label, icon: Icon, end, badge }) => (
           <NavLink
@@ -49,16 +47,16 @@ function Sidebar({ stats, onNavigate }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors ${
-                isActive ? "bg-primary/15 text-white" : "text-ink-tertiary hover:bg-white/5 hover:text-white"
+                isActive ? "bg-white/10 text-white shadow-[inset_3px_0_0_var(--color-accent)]" : "text-ink-tertiary hover:bg-white/5 hover:text-white"
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon className={`size-5 ${isActive ? "text-primary-soft" : ""}`} aria-hidden="true" />
+                <Icon className={`size-5 ${isActive ? "text-white" : ""}`} aria-hidden="true" />
                 <span className="flex-1">{label}</span>
                 {badge && stats?.[badge] > 0 && (
-                  <span className="rounded-full bg-primary px-2 py-0.5 text-[12px] font-bold text-white">
+                  <span className="rounded-md bg-accent px-2 py-0.5 text-[12px] font-bold text-white">
                     {stats[badge]}
                     <span className="sr-only"> non lus</span>
                   </span>

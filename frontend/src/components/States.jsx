@@ -10,7 +10,7 @@ export function Skeleton({ className = "" }) {
 
 export function ErrorState({ error, onRetry, title = "Chargement impossible" }) {
   return (
-    <div role="alert" className="flex flex-col items-center rounded-2xl border border-red-100 bg-red-50/60 px-6 py-12 text-center">
+    <div role="alert" className="flex flex-col items-center rounded-xl border border-red-100 bg-red-50/60 px-6 py-12 text-center">
       <AlertCircle className="size-8 text-red-500" aria-hidden="true" />
       <p className="mt-3 font-display text-lg font-semibold text-gray-900">{title}</p>
       <p className="mt-1 text-[15px] text-gray-600">{errorMessage(error)}</p>
@@ -25,7 +25,7 @@ export function ErrorState({ error, onRetry, title = "Chargement impossible" }) 
 
 export function EmptyState({ title, description, action }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-dashed border-gray-300 bg-gray-50/60 px-6 py-14 text-center">
+    <div className="flex flex-col items-center rounded-xl border border-dashed border-gray-300 bg-gray-50/60 px-6 py-14 text-center">
       <Inbox className="size-8 text-gray-400" aria-hidden="true" />
       <p className="mt-3 font-display text-lg font-semibold text-gray-900">{title}</p>
       {description && <p className="mt-1 max-w-md text-[15px] text-gray-600">{description}</p>}

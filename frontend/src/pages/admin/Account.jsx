@@ -62,7 +62,7 @@ export default function AdminAccount() {
   return (
     <AdminPage title="Mon compte" description={`Connecté en tant que ${user?.username}.`}>
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
-        <form noValidate onSubmit={submit} className="space-y-5 rounded-2xl border border-gray-200 bg-white p-5 shadow-card sm:p-8">
+        <form noValidate onSubmit={submit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-card sm:p-8">
           <h2 className="font-display text-lg font-semibold text-gray-900">Changer le mot de passe</h2>
           {password("old_password", "Mot de passe actuel", "current-password")}
           {password("new_password", "Nouveau mot de passe", "new-password")}
@@ -88,7 +88,7 @@ export default function AdminAccount() {
           </div>
         </form>
 
-        <aside className="rounded-2xl border border-gray-200 bg-white p-5 text-sm text-gray-600 shadow-card sm:p-6">
+        <aside className="rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-600 shadow-card sm:p-6">
           <h2 className="font-display text-base font-semibold text-gray-900">Autres administrateurs</h2>
           <p className="mt-2 leading-relaxed">
             La création de comptes administrateurs se fait depuis l'interface d'administration de Django (comptes

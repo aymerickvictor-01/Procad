@@ -87,7 +87,7 @@ export default function Contact() {
         <Container
           className={`grid items-start gap-10 lg:gap-12 ${hasContactCard ? "lg:grid-cols-[1fr_380px]" : "max-w-3xl"}`}
         >
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card sm:p-8">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card sm:p-8">
             {status.state === "sent" ? (
               <div className="flex flex-col items-center py-10 text-center" role="status">
                 <span className="grid size-16 place-items-center rounded-full bg-emerald-50 text-emerald-600">

@@ -173,7 +173,7 @@ export default function AdminMessages() {
               type="button"
               aria-pressed={isRead === value}
               onClick={() => update({ is_read: value, page: null })}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
                 isRead === value ? "bg-gray-900 text-white" : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
               }`}
             >
@@ -191,7 +191,7 @@ export default function AdminMessages() {
       </div>
 
       {messages.loading && !messages.data ? (
-        <Skeleton className="h-96 w-full rounded-2xl" />
+        <Skeleton className="h-96 w-full rounded-xl" />
       ) : messages.error ? (
         <ErrorState error={messages.error} onRetry={messages.reload} />
       ) : messages.data.results.length === 0 ? (
@@ -200,7 +200,7 @@ export default function AdminMessages() {
           description={isRead || search ? undefined : "Les messages envoyés depuis le formulaire de contact apparaîtront ici."}
         />
       ) : (
-        <div className="grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card lg:h-[640px] lg:grid-cols-[360px_1fr]">
+        <div className="grid overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card lg:h-[640px] lg:grid-cols-[360px_1fr]">
           <div className={`flex min-h-0 flex-col border-gray-200 lg:border-r ${selected ? "hidden lg:flex" : "flex"}`}>
             <ul className="flex-1 divide-y divide-gray-100 overflow-y-auto">
               {messages.data.results.map((message) => (

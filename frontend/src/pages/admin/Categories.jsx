@@ -106,7 +106,7 @@ export default function AdminCategories() {
       }
     >
       {categories.loading && !categories.data ? (
-        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-xl" />
       ) : categories.error ? (
         <ErrorState error={categories.error} onRetry={categories.reload} />
       ) : categories.data.length === 0 ? (
@@ -116,7 +116,7 @@ export default function AdminCategories() {
           action={<Button onClick={() => setEditing({})}>Créer une catégorie</Button>}
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card">
           <table className="w-full text-left text-[14px]">
             <thead className="border-b border-gray-200 bg-gray-50 text-[12px] font-semibold tracking-wide text-gray-500 uppercase">
               <tr>

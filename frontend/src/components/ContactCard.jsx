@@ -35,13 +35,12 @@ export default function ContactCard({ company, title = "Nous joindre", className
   if (!items.length) return null;
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-night p-7 text-ink shadow-card-hover sm:p-8 ${className}`}>
-      <div aria-hidden="true" className="absolute -top-20 -right-20 size-56 rounded-full bg-primary/25 blur-3xl" />
-      <p className="relative font-display text-xl font-semibold text-white">{title}</p>
-      <ul className="relative mt-6 space-y-5">
+    <div className={`relative overflow-hidden rounded-xl border-t-4 border-accent bg-night p-7 text-ink shadow-card-hover sm:p-8 ${className}`}>
+      <p className="font-display text-xl font-semibold text-white">{title}</p>
+      <ul className="mt-6 space-y-5">
         {items.map(({ icon: Icon, label, value, href, external }) => (
           <li key={label} className="flex gap-4">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/20 text-primary-soft">
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white/[0.07] text-white">
               <Icon className="size-5" aria-hidden="true" />
             </span>
             <div className="min-w-0">
@@ -61,7 +60,7 @@ export default function ContactCard({ company, title = "Nous joindre", className
           </li>
         ))}
       </ul>
-      <SocialIcons company={company} className="relative mt-7 border-t border-white/10 pt-6" />
+      <SocialIcons company={company} className="mt-7 border-t border-white/10 pt-6" />
     </div>
   );
 }

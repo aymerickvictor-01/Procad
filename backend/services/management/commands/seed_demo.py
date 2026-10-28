@@ -26,9 +26,9 @@ DEMO_SUFFIX = " (démo)"
 DEMO_EMAIL_DOMAIN = "@demo.example.com"
 
 CATEGORIES = [
-    ("informatique", "Informatique", "Matériel, logiciels et réseaux.", "#1f3a5f"),
-    ("electricite", "Électricité", "Installations et mises aux normes.", "#0f766e"),
-    ("formation", "Formation", "Sessions pour vos équipes.", "#7c3aed"),
+    ("informatique", "Informatique", "Matériel, logiciels et réseaux.", "#1530e0"),
+    ("electricite", "Électricité", "Installations et mises aux normes.", "#0a1240"),
+    ("formation", "Formation", "Sessions pour vos équipes.", "#18236a"),
 ]
 
 SERVICES = [

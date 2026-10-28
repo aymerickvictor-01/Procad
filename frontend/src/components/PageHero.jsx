@@ -32,18 +32,15 @@ export function Breadcrumb({ items }) {
 export default function PageHero({ eyebrow, title, description, breadcrumb, children }) {
   return (
     <section className="relative overflow-hidden bg-night text-ink">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="bg-dots absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_70%)]" />
-        <div className="absolute -top-48 left-1/3 h-[420px] w-[760px] rounded-full bg-primary/20 blur-[120px]" />
-      </div>
-      <Container className="relative py-14 sm:py-20">
+      <div aria-hidden="true" className="bg-blueprint absolute inset-0 [mask-image:linear-gradient(to_right,black,transparent_85%)]" />
+      <Container className="relative py-12 sm:py-16">
         {breadcrumb && <Breadcrumb items={breadcrumb} />}
         {eyebrow && (
           <Eyebrow dark className="mt-8">
             {eyebrow}
           </Eyebrow>
         )}
-        <h1 className="mt-5 max-w-3xl text-4xl leading-[1.08] font-bold tracking-[-0.03em] text-white sm:text-5xl">
+        <h1 className="mt-4 max-w-3xl text-4xl leading-[1.08] font-bold tracking-[-0.03em] text-white sm:text-[44px]">
           {title}
         </h1>
         {description && (
@@ -51,7 +48,6 @@ export default function PageHero({ eyebrow, title, description, breadcrumb, chil
         )}
         {children}
       </Container>
-      <div className="divider-glow" />
     </section>
   );
 }

@@ -1,38 +1,42 @@
 @import "tailwindcss";
 
 /*
- * Système de design PROCAD.
- * Surfaces sombres chaudes + bleu électrique, boutons en pilule, cartes arrondies à 16 px.
- * Couleurs à réajuster quand le logo sera fourni.
+ * Système de design PROCAD, aux couleurs du logo :
+ * bleu PROCAD (#0000FF, légèrement approfondi pour la lisibilité), rouge PROCAD en accent,
+ * surfaces sombres bleu marine, angles sobres, trame de plan technique.
  */
 @theme {
   --font-sans: "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display: "Inter Tight Variable", "Inter Variable", "Helvetica Neue", Arial, sans-serif;
 
-  /* Couleur principale */
-  --color-primary: #4162ff;
-  --color-primary-dark: #2a4be0;
-  --color-primary-deep: #2e4fe8;
-  --color-primary-light: #6b8fff;
-  --color-primary-soft: #8ba4ff;
+  /* Bleu PROCAD */
+  --color-primary: #1530e0;
+  --color-primary-dark: #0e22b0;
+  --color-primary-deep: #0a1a8c;
+  --color-primary-light: #4a5ff0;
+  --color-primary-soft: #a9b3f7;
 
-  /* Surfaces sombres (en-tête, héros, pied de page) */
-  --color-night: #100e0c;
-  --color-night-elevated: #1b1714;
-  --color-night-subtle: #241e1a;
+  /* Rouge PROCAD (accents : filets, sur-titres, indicateurs) */
+  --color-accent: #e41e26;
+  --color-accent-dark: #c1151c;
+
+  /* Surfaces sombres bleu marine (héros, pied de page) */
+  --color-night: #0a1240;
+  --color-night-elevated: #111b52;
+  --color-night-subtle: #18236a;
 
   /* Texte sur fond sombre */
-  --color-ink: #fcfaf7;
-  --color-ink-secondary: #d6cfc8;
-  --color-ink-tertiary: #a39b93;
-  --color-ink-muted: #7a726a;
+  --color-ink: #f5f7ff;
+  --color-ink-secondary: #cdd3f0;
+  --color-ink-tertiary: #9aa3cf;
+  --color-ink-muted: #7a84b5;
 
-  /* Sections claires */
-  --color-cream: #f5f1eb;
+  /* Sections claires alternées */
+  --color-cream: #f3f5fa;
 
-  --shadow-glow: 0 10px 30px -8px rgb(65 98 255 / 0.55);
-  --shadow-card: 0 4px 6px -1px rgb(16 14 12 / 0.06), 0 2px 4px -2px rgb(16 14 12 / 0.06);
-  --shadow-card-hover: 0 20px 40px -12px rgb(16 14 12 / 0.18);
+  --shadow-glow: 0 1px 2px rgb(10 18 64 / 0.12);
+  --shadow-card: 0 1px 2px rgb(10 18 64 / 0.06), 0 1px 3px rgb(10 18 64 / 0.06);
+  --shadow-card-hover: 0 12px 28px -10px rgb(10 18 64 / 0.22);
 }
 
 @layer base {
@@ -65,29 +69,22 @@
   }
 }
 
-/* Texte en dégradé bleu */
-@utility text-gradient {
-  background-image: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-soft) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Tuile « verre » sur fond sombre */
+/* Panneau discret sur fond sombre */
 @utility glass {
-  background-image: linear-gradient(135deg, rgb(65 98 255 / 0.16), rgb(107 143 255 / 0.04));
-  border: 1px solid rgb(65 98 255 / 0.28);
-  backdrop-filter: blur(8px);
+  background-color: rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.1);
 }
 
-/* Trame de points discrète pour les fonds sombres */
-@utility bg-dots {
-  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px);
-  background-size: 22px 22px;
+/* Trame de plan technique (quadrillage léger) pour les fonds sombres */
+@utility bg-blueprint {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
-/* Séparateur horizontal en dégradé */
+/* Filet horizontal fin */
 @utility divider-glow {
   height: 1px;
-  background-image: linear-gradient(90deg, transparent, rgb(65 98 255 / 0.35), transparent);
+  background-color: rgb(255 255 255 / 0.1);
 }

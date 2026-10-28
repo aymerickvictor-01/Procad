@@ -12,7 +12,7 @@ function StatCard({ label, value, icon: Icon, to, highlight }) {
   return (
     <Link
       to={to}
-      className={`group rounded-2xl border bg-white p-5 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover ${
+      className={`group rounded-xl border bg-white p-5 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover ${
         highlight ? "border-primary/30" : "border-gray-200"
       }`}
     >
@@ -38,8 +38,8 @@ export default function Dashboard() {
 
   return (
     <AdminPage
-      title={`Bonjour${user?.first_name ? ` ${user.first_name}` : ""} 👋`}
-      description="Vue d'ensemble du site et des dernières demandes reçues."
+      title="Tableau de bord"
+      description={`Bienvenue${user?.first_name ? `, ${user.first_name}` : ""}. Vue d'ensemble du site et des dernières demandes reçues.`}
       actions={
         <>
           <Button to="/admin/entreprise" variant="outline" size="sm">
@@ -70,7 +70,7 @@ export default function Dashboard() {
         />
       </div>
 
-      <section className="mt-8 rounded-2xl border border-gray-200 bg-white shadow-card">
+      <section className="mt-8 rounded-xl border border-gray-200 bg-white shadow-card">
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <h2 className="font-display text-lg font-semibold text-gray-900">Derniers messages</h2>
           <Link to="/admin/messages" className="text-sm font-semibold text-primary hover:underline">

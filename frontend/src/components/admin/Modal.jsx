@@ -25,7 +25,7 @@ export default function Modal({ open, onClose, title, children, footer, size = "
         onClose();
       }}
       onClick={(event) => event.target === ref.current && onClose()}
-      className={`m-auto w-[calc(100%-2rem)] ${size} rounded-2xl bg-white p-0 text-gray-900 shadow-2xl backdrop:bg-night/60 backdrop:backdrop-blur-sm`}
+      className={`m-auto w-[calc(100%-2rem)] ${size} rounded-xl bg-white p-0 text-gray-900 shadow-2xl backdrop:bg-night/60 backdrop:backdrop-blur-sm`}
     >
       {open && (
         <div className="flex max-h-[85dvh] flex-col">

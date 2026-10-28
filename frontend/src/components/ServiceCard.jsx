@@ -7,7 +7,7 @@ export default function ServiceCard({ service }) {
   return (
     <Link
       to={`/services/${service.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card transition-all duration-500 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-card-hover"
+      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card transition-all duration-500 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-card-hover"
     >
       <div className="aspect-[16/10] overflow-hidden bg-gray-100">
         {service.cover_image ? (
@@ -18,8 +18,8 @@ export default function ServiceCard({ service }) {
             className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="grid size-full place-items-center bg-linear-to-br from-night to-night-subtle">
-            <Layers className="size-10 text-primary-soft/60" aria-hidden="true" />
+          <div className="grid size-full place-items-center bg-night">
+            <Layers className="size-10 text-ink-muted" aria-hidden="true" />
           </div>
         )}
       </div>
@@ -48,7 +48,7 @@ export default function ServiceCard({ service }) {
 
 export function ServiceCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white" aria-hidden="true">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white" aria-hidden="true">
       <Skeleton className="aspect-[16/10] rounded-none" />
       <div className="space-y-3 p-6">
         <Skeleton className="h-3 w-24" />

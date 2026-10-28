@@ -20,7 +20,7 @@ function Pill({ active, onClick, children }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors ${
+      className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors ${
         active ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
       }`}
     >
@@ -120,7 +120,7 @@ export default function Services() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Rechercher un service…"
-                className="w-full rounded-full border border-gray-300 bg-white py-2.5 pr-10 pl-11 text-[15px] transition outline-none placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10"
+                className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pr-10 pl-11 text-[15px] transition outline-none placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10"
               />
               {query && (
                 <button
