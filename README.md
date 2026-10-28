@@ -36,7 +36,7 @@ docker compose up --build
 
 | Adresse                          | Contenu                     |
 |----------------------------------|-----------------------------|
-| http://localhost:5173            | Site (React)                |
+| http://localhost:5174            | Site (React) — 5174 car le 5173 est pris par un autre projet |
 | http://localhost:8000/api/docs/  | Documentation de l'API      |
 | http://localhost:8000/django-admin/ | Admin Django (secours)   |
 | http://localhost:5050            | pgAdmin (identifiants : `PGADMIN_EMAIL` / `PGADMIN_PASSWORD`) |
