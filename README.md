@@ -68,6 +68,21 @@ docker compose exec backend python manage.py test
 | GET  | `/api/testimonials/` | Témoignages publiés — `service` (slug) |
 | POST | `/api/contact/` | Message de contact (5 par heure et par IP) |
 
+## Authentification (session + CSRF)
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET  | `/api/auth/csrf/` | Pose le cookie `csrftoken` (à appeler en premier) |
+| POST | `/api/auth/login/` | `{username, password}` — comptes staff uniquement, 10 essais/min |
+| POST | `/api/auth/logout/` | Ferme la session |
+| GET  | `/api/auth/me/` | Utilisateur connecté — **401** si non connecté |
+| POST | `/api/auth/change-password/` | `{old_password, new_password}` |
+
+Toute requête POST/PUT/PATCH/DELETE doit envoyer l'en-tête `X-CSRFToken` avec la valeur
+du cookie `csrftoken`. Le jeton change après la connexion : toujours relire le cookie.
+
+Codes : **401** = non connecté, **403** = connecté sans les droits (ou jeton CSRF absent).
+
 Documentation interactive complète : http://localhost:8000/api/docs/
 
 > Les sections « Production » et « Déploiement » seront complétées aux étapes 6 et 7.

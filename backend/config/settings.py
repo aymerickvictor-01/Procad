@@ -123,7 +123,7 @@ MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024
 # --- Django REST Framework ----------------------------------------------------
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["common.authentication.SessionAuthentication401"],
     # Surchargé par IsAdminUser sur les routes /api/admin/
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "DEFAULT_PAGINATION_CLASS": "common.pagination.StandardPagination",
@@ -134,7 +134,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_THROTTLE_RATES": {"contact": "5/hour", "login": "10/min"},
+    "DEFAULT_THROTTLE_RATES": {"contact": "5/hour", "login": "10/min", "password": "10/hour"},
     # Nombre de proxys devant Django (Nginx = 1). Sans ce réglage, la limitation
     # de débit verrait l'IP du proxy pour tous les visiteurs.
     "NUM_PROXIES": int(os.environ.get("DJANGO_NUM_PROXIES", "0")),
