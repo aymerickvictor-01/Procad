@@ -18,8 +18,9 @@ backend/     API Django (accounts, company, services, testimonials, contact)
 frontend/    Application React (Vite)
 nginx/       Production : templates/ (http-only.conf, https.conf) et snippets/ (routes communes)
 postman/     Collection et environnement Postman
+scripts/     Sauvegarde, restauration, renouvellement du certificat
 e2e/         Tests de bout en bout dans le navigateur
-docs/        Document de conception, logo (docs/brand/)
+docs/        Guide de déploiement (deploiement.md), logo (docs/brand/)
 ```
 
 ## Prérequis
@@ -184,4 +185,18 @@ sed -i 's/^NGINX_CONFIG=.*/NGINX_CONFIG=https/' .env
 docker compose -f docker-compose.prod.yml up -d web
 ```
 
-Le déploiement sur le serveur (DNS, certificat, renouvellement, sauvegardes) est décrit à l'étape 7.
+### Sauvegardes
+
+```bash
+scripts/backup.sh                                   # base + images dans backups/AAAA-MM-JJ_HHMMSS/
+scripts/restore.sh backups/2026-10-28_023000        # remplace la base et les images (confirmation)
+```
+
+Par défaut, les scripts visent `docker-compose.prod.yml`. Pour un autre environnement, définir
+`PROCAD_COMPOSE`, par exemple `PROCAD_COMPOSE="docker compose" scripts/backup.sh` en développement
+(sous Windows : depuis Git Bash).
+
+### Mise en ligne
+
+Serveur, DNS, certificat HTTPS, tâches planifiées, sauvegardes hors serveur et mises à jour :
+[docs/deploiement.md](docs/deploiement.md).
