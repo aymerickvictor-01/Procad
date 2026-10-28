@@ -33,6 +33,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "drf_spectacular",
+    # Applications du projet
+    "accounts",
+    "company",
+    "services",
+    "testimonials",
+    "contact",
 ]
 
 MIDDLEWARE = [
@@ -101,6 +107,9 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Taille maximale d'une image téléversée (logo, couverture, galerie, photo)
+MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024
 
 # --- Django REST Framework ----------------------------------------------------
 
