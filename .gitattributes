@@ -1,0 +1,10 @@
+# Fins de ligne LF dans le dépôt : indispensable pour les scripts et
+# fichiers exécutés dans les conteneurs Linux (un CRLF casse sh et Nginx).
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.pdf binary
