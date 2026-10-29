@@ -76,6 +76,10 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py createsu
 docker compose -f docker-compose.prod.yml exec backend python manage.py load_catalogue
 ```
 
+Renseigner ensuite le numéro WhatsApp dans l'administration (Entreprise), et configurer l'envoi
+des e-mails dans `.env` (variables `DJANGO_EMAIL_*`, voir le README, « Demandes de devis,
+WhatsApp et alertes par e-mail ») avec `DJANGO_SITE_URL=https://procad.com`.
+
 Le site public répond alors en HTTP sur http://procad.com. La connexion à l'administration ne
 fonctionne pas encore : les cookies de session sont réservés à HTTPS, c'est voulu. Ne pas lancer
 `seed_demo` en production.
@@ -134,7 +138,7 @@ Le fuseau horaire du serveur fixe l'heure d'exécution : `sudo timedatectl set-t
 | Fichier | Contenu |
 |---------|---------|
 | `db.dump` | Toute la base : services, catégories, témoignages, messages, profil, comptes |
-| `media.tar.gz` | Toutes les images téléversées (logo, bannière, couvertures, galeries, photos) |
+| `media.tar.gz` | Toutes les images téléversées (logo, bannière, couvertures, galeries, photos) et les pièces jointes des demandes de devis |
 | `SHA256SUMS` | Empreintes, pour détecter un fichier abîmé |
 
 Chaque sauvegarde est contrôlée (export lisible, archive valide) avant d'être conservée. Les

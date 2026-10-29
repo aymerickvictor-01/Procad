@@ -48,6 +48,7 @@ services:
     volumes:
       - ./backend:/app # rechargement automatique du code
       - media_data:/app/media
+      - private_data:/app/private # pièces jointes des devis (jamais publiques)
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     depends_on:
@@ -74,3 +75,4 @@ volumes:
   pgdata:
   pgadmin_data:
   media_data:
+  private_data:

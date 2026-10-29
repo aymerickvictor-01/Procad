@@ -8,9 +8,10 @@ class CompanyConfig(AppConfig):
 
     def ready(self):
         from common.files import cleanup_files
-        from common.images import optimize_images
+        from common.images import image_variants, optimize_images
 
         from .models import CompanyProfile
 
         cleanup_files(CompanyProfile, "logo", "hero_image")
         optimize_images(CompanyProfile, "logo", "hero_image")
+        image_variants(CompanyProfile, "logo", "hero_image")

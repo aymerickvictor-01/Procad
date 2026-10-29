@@ -1,5 +1,7 @@
 import { Star } from "lucide-react";
 
+import ResponsiveImage from "./ResponsiveImage";
+
 export function Stars({ rating, className = "" }) {
   if (!rating) return null;
   return (
@@ -32,7 +34,12 @@ export default function TestimonialCard({ testimonial }) {
       </blockquote>
       <figcaption className="mt-6 flex items-center gap-3 border-t border-gray-100 pt-5">
         {testimonial.photo ? (
-          <img src={testimonial.photo} alt="" loading="lazy" className="size-11 rounded-full object-cover" />
+          <ResponsiveImage
+            src={testimonial.photo}
+            variants={testimonial.photo_variants}
+            sizes="44px"
+            className="size-11 rounded-full object-cover"
+          />
         ) : (
           <span
             aria-hidden="true"

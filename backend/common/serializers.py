@@ -1,5 +1,8 @@
 from django.db import models
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+
+from .images import existing_variants
 
 
 class RelativeImageField(serializers.ImageField):
@@ -17,3 +20,18 @@ class BaseModelSerializer(serializers.ModelSerializer):
         **serializers.ModelSerializer.serializer_field_mapping,
         models.ImageField: RelativeImageField,
     }
+
+
+@extend_schema_field({"type": "object", "additionalProperties": {"type": "string"}, "nullable": True})
+class ImageVariantsField(serializers.Field):
+    """
+    Versions WebP allégées d'une image : {"480": "/media/…w480.webp", "960": …}.
+    Sert à construire l'attribut srcset côté site ; vide si l'image n'a pas de version réduite.
+    """
+
+    def __init__(self, **kwargs):
+        kwargs["read_only"] = True
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        return existing_variants(value)

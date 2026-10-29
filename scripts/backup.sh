@@ -6,7 +6,7 @@
 #
 # Crée backups/AAAA-MM-JJ_HHMMSS/ contenant :
 #   db.dump        export de la base (format personnalisé pg_dump, compressé)
-#   media.tar.gz   archive du dossier media
+#   media.tar.gz   images du site (media) et pièces jointes des devis (private)
 #   SHA256SUMS     empreintes, vérifiées par restore.sh
 #
 # Variables :
@@ -37,8 +37,8 @@ mkdir -p "$tmp"
 log "Export de la base de données"
 $COMPOSE exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom' > "$tmp/db.dump"
 
-log "Archive des images (media)"
-$COMPOSE exec -T backend tar -czf - -C /app media > "$tmp/media.tar.gz"
+log "Archive des images et des pièces jointes"
+$COMPOSE exec -T backend tar -czf - -C /app media private > "$tmp/media.tar.gz"
 
 # Contrôles : un export vide ou illisible ne doit jamais passer pour une sauvegarde.
 $COMPOSE exec -T db pg_restore --list < "$tmp/db.dump" > /dev/null

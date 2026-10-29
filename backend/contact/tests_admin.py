@@ -84,6 +84,7 @@ class AdminMessagesCompanyStatsTests(APITestCase):
                 "categories": 1,
                 "messages_unread": 1,
                 "messages_total": 2,
+                "quotes_unread": 0,
                 "testimonials_published": 1,
                 "testimonials_total": 2,
             },

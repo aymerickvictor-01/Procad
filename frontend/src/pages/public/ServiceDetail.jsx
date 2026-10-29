@@ -6,22 +6,31 @@ import { getService, getServices, getTestimonials } from "../../api/public";
 import Button from "../../components/Button";
 import Container from "../../components/Container";
 import PageHero from "../../components/PageHero";
+import ResponsiveImage from "../../components/ResponsiveImage";
 import Reveal from "../../components/Reveal";
 import SectionHeader, { Eyebrow } from "../../components/SectionHeader";
 import ServiceCard from "../../components/ServiceCard";
 import { ErrorState, Skeleton } from "../../components/States";
 import TestimonialCard from "../../components/TestimonialCard";
+import WhatsAppIcon from "../../components/WhatsAppIcon";
 import { STEPS } from "../../content/method";
 import { useCompany } from "../../context/CompanyContext";
+import { useWhatsAppTopic } from "../../context/WhatsAppContext";
 import useApi from "../../hooks/useApi";
+import { whatsappMessage, whatsappUrl } from "../../lib/whatsapp";
 import NotFound from "./NotFound";
 
 /* --- Galerie ------------------------------------------------------------------ */
 
 function Gallery({ service }) {
   const images = [
-    service.cover_image && { id: "cover", image: service.cover_image, alt_text: service.title },
-    ...service.images,
+    service.cover_image && {
+      id: "cover",
+      image: service.cover_image,
+      variants: service.cover_image_variants,
+      alt_text: service.title,
+    },
+    ...service.images.map((image) => ({ ...image, variants: image.image_variants })),
   ].filter(Boolean);
   const [selected, setSelected] = useState(0);
   const current = images[Math.min(selected, images.length - 1)];
@@ -37,7 +46,15 @@ function Gallery({ service }) {
   return (
     <div>
       <div className="aspect-[16/10] overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-        <img key={current.id} src={current.image} alt={current.alt_text || service.title} className="animate-fade-up size-full object-cover" />
+        <ResponsiveImage
+          key={current.id}
+          src={current.image}
+          variants={current.variants}
+          sizes="(min-width: 1024px) 760px, 100vw"
+          priority={selected === 0}
+          alt={current.alt_text || service.title}
+          className="animate-fade-up size-full object-cover"
+        />
       </div>
       {images.length > 1 && (
         <div className="mt-3 grid grid-cols-4 gap-3 sm:grid-cols-5">
@@ -52,7 +69,7 @@ function Gallery({ service }) {
                 index === selected ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
               }`}
             >
-              <img src={image.image} alt="" loading="lazy" className="size-full object-cover" />
+              <ResponsiveImage src={image.image} variants={image.variants} sizes="120px" className="size-full object-cover" />
             </button>
           ))}
         </div>
@@ -198,6 +215,7 @@ const ASSURANCES = [
 ];
 
 function Sidebar({ service, company, categoryCount }) {
+  const whatsapp = whatsappUrl(company.whatsapp, whatsappMessage(company.name, service.title));
   return (
     <aside className="space-y-4 lg:sticky lg:top-28">
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
@@ -213,6 +231,16 @@ function Sidebar({ service, company, categoryCount }) {
         <Button to={`/contact?service=${service.slug}`} className="mt-5 w-full">
           Demander un devis <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
+        {whatsapp && (
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-[#25d366]/50 bg-[#25d366]/10 px-5 py-3 text-[15px] font-semibold text-[#0b7a3b] transition-colors hover:bg-[#25d366]/20"
+          >
+            <WhatsAppIcon className="size-5" /> Discuter sur WhatsApp
+          </a>
+        )}
         {company.phone && (
           <Button href={`tel:${company.phone.replace(/\s/g, "")}`} variant="outline" className="mt-3 w-full">
             <Phone className="size-4" aria-hidden="true" /> {company.phone}
@@ -307,6 +335,7 @@ export default function ServiceDetail() {
     { label: service?.title ?? "…" },
   ];
   const others = (similar.data?.results ?? []).filter((s) => s.slug !== slug).slice(0, 3);
+  useWhatsAppTopic(service?.title);
 
   return (
     <>
@@ -323,6 +352,7 @@ export default function ServiceDetail() {
         description={service?.short_description}
         breadcrumb={breadcrumb}
         image={service?.cover_image || "/images/fonds/services.jpg"}
+        imageVariants={service?.cover_image ? service.cover_image_variants : undefined}
       />
 
       {detail.loading ? (

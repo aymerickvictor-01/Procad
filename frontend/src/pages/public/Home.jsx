@@ -6,13 +6,16 @@ import ContactCard, { contactItems } from "../../components/ContactCard";
 import Container from "../../components/Container";
 import DomainsDiagram from "../../components/DomainsDiagram";
 import { PhotoBackground } from "../../components/PageHero";
+import ResponsiveImage, { staticVariants } from "../../components/ResponsiveImage";
 import Reveal, { CountUp, useInView } from "../../components/Reveal";
 import SectionHeader, { Eyebrow } from "../../components/SectionHeader";
 import ServiceCard, { ServiceCardSkeleton } from "../../components/ServiceCard";
 import { EmptyState, ErrorState } from "../../components/States";
 import TestimonialCard from "../../components/TestimonialCard";
+import WhatsAppIcon from "../../components/WhatsAppIcon";
 import { STEPS } from "../../content/method";
 import { useCompany } from "../../context/CompanyContext";
+import { whatsappMessage, whatsappUrl } from "../../lib/whatsapp";
 import useApi from "../../hooks/useApi";
 
 function averageRating(testimonials) {
@@ -41,7 +44,11 @@ function Hero({ company }) {
 
   return (
     <section className="relative isolate overflow-hidden bg-night text-ink">
-      <PhotoBackground image={company.hero_image || DEFAULT_HERO} zoom />
+      <PhotoBackground
+        image={company.hero_image || DEFAULT_HERO}
+        variants={company.hero_image ? company.hero_image_variants : undefined}
+        zoom
+      />
       <Container className="relative flex min-h-[560px] flex-col justify-center pt-16 pb-32 sm:min-h-[620px] sm:pt-20 sm:pb-36">
         <div className="max-w-2xl">
           <Eyebrow dark className="animate-fade-up">
@@ -182,10 +189,11 @@ function Method() {
     <section className="py-20 sm:py-24">
       <Container className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <Reveal className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
-          <img
+          <ResponsiveImage
             src="/images/fonds/a-propos.jpg"
+            variants={staticVariants("/images/fonds/a-propos.jpg")}
+            sizes="(min-width: 1024px) 50vw, 100vw"
             alt="Ingénieurs échangeant sur un chantier"
-            loading="lazy"
             className="size-full object-cover"
           />
         </Reveal>
@@ -273,11 +281,12 @@ function Testimonials({ testimonials }) {
 /* --- Appel à l'action final ---------------------------------------------------------- */
 
 function FinalCta({ company }) {
+  const whatsapp = whatsappUrl(company.whatsapp, whatsappMessage(company.name));
   return (
     <section className="py-20 sm:py-24">
       <Container>
         <Reveal className="relative isolate overflow-hidden rounded-xl bg-night px-6 py-14 sm:px-12 sm:py-16">
-          <PhotoBackground image="/images/fonds/projet.jpg" />
+          <PhotoBackground image="/images/fonds/projet.jpg" lazy />
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <Eyebrow dark>Contact</Eyebrow>
@@ -292,6 +301,11 @@ function FinalCta({ company }) {
               <Button to="/contact" size="lg">
                 Nous contacter <ArrowRight className="size-4" aria-hidden="true" />
               </Button>
+              {whatsapp && (
+                <Button href={whatsapp} target="_blank" rel="noopener noreferrer" variant="secondary" size="lg">
+                  <WhatsAppIcon className="size-5" /> WhatsApp
+                </Button>
+              )}
               {company.phone && (
                 <Button href={tel(company.phone)} variant="secondary" size="lg">
                   <Phone className="size-4" aria-hidden="true" /> {company.phone}

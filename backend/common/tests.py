@@ -6,6 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from PIL import Image
 
+from common.images import existing_variants, variant_name
 from services.models import Category, Service
 
 TEMP_MEDIA = tempfile.mkdtemp()
@@ -59,3 +60,45 @@ class ImageOptimizationTests(TestCase):
         stored = self.save_cover(SimpleUploadedFile("logo.png", buffer.getvalue(), content_type="image/png"))
         self.assertEqual(stored.format, "PNG")
         self.assertEqual(stored.mode, "RGBA")
+
+
+@override_settings(MEDIA_ROOT=TEMP_MEDIA, IMAGE_MAX_SIDE=1920)
+class ImageVariantTests(TestCase):
+    """Versions WebP allégées générées à l'enregistrement, supprimées avec l'image."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = Category.objects.create(name="Bâtiment")
+
+    def create(self, width, height):
+        return Service.objects.create(
+            category=self.category, title="S", short_description="r", description="d",
+            is_published=True, cover_image=jpeg_with_exif(width, height),
+        )
+
+    def test_variants_narrower_than_the_original_are_created(self):
+        service = self.create(1200, 800)
+        storage, name = service.cover_image.storage, service.cover_image.name
+        self.assertTrue(storage.exists(variant_name(name, 480)))
+        self.assertTrue(storage.exists(variant_name(name, 960)))
+        self.assertFalse(storage.exists(variant_name(name, 1600)))  # plus large que l'original
+        with Image.open(storage.path(variant_name(name, 480))) as variant:
+            self.assertEqual((variant.format, variant.width), ("WEBP", 480))
+
+    def test_api_lists_the_variants(self):
+        self.create(1200, 800)
+        cover = self.client.get("/api/services/").json()["results"][0]["cover_image_variants"]
+        self.assertEqual(sorted(cover), ["480", "960"])
+        self.assertTrue(cover["480"].startswith("/media/") and cover["480"].endswith(".w480.webp"))
+
+    def test_small_image_has_no_variant(self):
+        service = self.create(300, 200)
+        self.assertEqual(existing_variants(service.cover_image), {})
+
+    def test_variants_are_deleted_with_the_image(self):
+        service = self.create(1200, 800)
+        storage, name = service.cover_image.storage, service.cover_image.name
+        with self.captureOnCommitCallbacks(execute=True):
+            service.delete()
+        self.assertFalse(storage.exists(name))
+        self.assertFalse(storage.exists(variant_name(name, 480)))

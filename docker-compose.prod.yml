@@ -29,6 +29,7 @@ services:
     volumes:
       - static_data:/app/staticfiles
       - media_data:/app/media
+      - private_data:/app/private # pièces jointes des devis : jamais servies par Nginx
     depends_on:
       db:
         condition: service_healthy
@@ -72,5 +73,6 @@ volumes:
   pgdata:
   static_data:
   media_data:
+  private_data:
   certbot_www:
   certbot_conf:

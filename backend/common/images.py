@@ -1,3 +1,4 @@
+import logging
 from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
@@ -5,10 +6,12 @@ from uuid import uuid4
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 from django.utils.deconstruct import deconstructible
 from PIL import Image, ImageOps
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_IMAGE_FORMATS = {"JPEG": ".jpg", "PNG": ".png", "WEBP": ".webp"}
 
@@ -84,6 +87,74 @@ def optimize_image(file, max_side=None):
             image.save(buffer, "PNG", optimize=True)
     file.seek(0)
     return ContentFile(buffer.getvalue(), name=Path(file.name).name)
+
+
+# --- Versions allégées (WebP) pour les écrans plus petits ------------------------------
+#
+# Pour chaque image, des copies WebP de largeur réduite sont enregistrées à côté de l'original :
+# « services/2026/10/abc.jpg » -> « services/2026/10/abc.w480.webp », « abc.w960.webp »…
+# Le navigateur choisit la plus adaptée à l'écran (attribut srcset) : un téléphone télécharge
+# quelques dizaines de Ko au lieu de l'image complète.
+
+VARIANT_WIDTHS = (480, 960, 1600)
+
+
+def variant_name(name, width):
+    return f"{Path(name).with_suffix('').as_posix()}.w{width}.webp"
+
+
+def variant_names(name):
+    return [variant_name(name, width) for width in VARIANT_WIDTHS]
+
+
+def generate_variants(fieldfile):
+    """Crée les versions WebP plus étroites que l'original (une image de 800 px n'a que la 480)."""
+    storage, name = fieldfile.storage, fieldfile.name
+    with storage.open(name, "rb") as file, Image.open(file) as source:
+        image = source.convert("RGBA" if source.mode in ("RGBA", "LA", "P") else "RGB")
+    created = 0
+    for width in VARIANT_WIDTHS:
+        if width >= image.width:
+            break
+        copy = image.copy()
+        copy.thumbnail((width, image.height), Image.Resampling.LANCZOS)
+        buffer = BytesIO()
+        copy.save(buffer, "WEBP", quality=80, method=6)
+        target = variant_name(name, width)
+        storage.delete(target)  # sinon le stockage ajouterait un suffixe au nom
+        storage.save(target, ContentFile(buffer.getvalue()))
+        created += 1
+    return created
+
+
+def existing_variants(fieldfile):
+    """{largeur: url} des versions présentes sur le disque."""
+    if not fieldfile:
+        return {}
+    storage = fieldfile.storage
+    variants = {}
+    for width in VARIANT_WIDTHS:
+        name = variant_name(fieldfile.name, width)
+        if not storage.exists(name):
+            break
+        variants[str(width)] = storage.url(name)
+    return variants
+
+
+def image_variants(model, *field_names):
+    """Génère les versions allégées après l'enregistrement d'une image (si elles manquent)."""
+
+    def on_save(sender, instance, **kwargs):
+        for name in field_names:
+            file = getattr(instance, name)
+            if not file or file.storage.exists(variant_name(file.name, VARIANT_WIDTHS[0])):
+                continue
+            try:
+                generate_variants(file)
+            except Exception:  # une image illisible ne doit pas bloquer l'enregistrement
+                logger.exception("Versions allégées non générées pour %s", file.name)
+
+    post_save.connect(on_save, sender=model, weak=False, dispatch_uid=f"image_variants_{model._meta.label_lower}")
 
 
 def optimize_images(model, *field_names):

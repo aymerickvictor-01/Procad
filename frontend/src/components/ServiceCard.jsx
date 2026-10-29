@@ -1,6 +1,7 @@
 import { ArrowRight, Layers } from "lucide-react";
 import { Link } from "react-router";
 
+import ResponsiveImage from "./ResponsiveImage";
 import { Skeleton } from "./States";
 
 export default function ServiceCard({ service }) {
@@ -11,10 +12,10 @@ export default function ServiceCard({ service }) {
     >
       <div className="aspect-[16/10] overflow-hidden bg-gray-100">
         {service.cover_image ? (
-          <img
+          <ResponsiveImage
             src={service.cover_image}
-            alt=""
-            loading="lazy"
+            variants={service.cover_image_variants}
+            sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
             className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (

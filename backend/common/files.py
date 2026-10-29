@@ -1,10 +1,13 @@
 from django.db import transaction
 from django.db.models.signals import post_delete, pre_save
 
+from .images import variant_names
+
 
 def _delete_after_commit(file):
-    storage, name = file.storage, file.name
-    transaction.on_commit(lambda: storage.delete(name))
+    # Avec l'original partent ses versions allégées (common.images) ; absentes, rien n'est fait.
+    storage, names = file.storage, [file.name, *variant_names(file.name)]
+    transaction.on_commit(lambda: [storage.delete(name) for name in names])
 
 
 def cleanup_files(model, *field_names):

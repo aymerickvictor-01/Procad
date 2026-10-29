@@ -6,6 +6,7 @@ __pycache__
 venv
 .venv
 media
+private
 staticfiles
 .pytest_cache
 .coverage

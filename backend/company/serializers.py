@@ -1,9 +1,11 @@
-from common.serializers import BaseModelSerializer
+from common.serializers import BaseModelSerializer, ImageVariantsField
 
 from .models import CompanyProfile
 
 
 class CompanyProfileSerializer(BaseModelSerializer):
+    hero_image_variants = ImageVariantsField(source="hero_image")
+
     class Meta:
         model = CompanyProfile
         exclude = ["id"]

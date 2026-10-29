@@ -26,7 +26,7 @@ def health(request):
 class LatestMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
-        fields = ["id", "full_name", "subject", "is_read", "created_at"]
+        fields = ["id", "kind", "reference", "full_name", "subject", "is_read", "created_at"]
 
 
 @extend_schema(
@@ -40,6 +40,7 @@ class LatestMessageSerializer(serializers.ModelSerializer):
             "categories": serializers.IntegerField(),
             "messages_unread": serializers.IntegerField(),
             "messages_total": serializers.IntegerField(),
+            "quotes_unread": serializers.IntegerField(),
             "testimonials_published": serializers.IntegerField(),
             "testimonials_total": serializers.IntegerField(),
             "latest_messages": LatestMessageSerializer(many=True),
@@ -52,7 +53,11 @@ def admin_stats(request):
     services = Service.objects.aggregate(
         published=Count("id", filter=Q(is_published=True)), draft=Count("id", filter=Q(is_published=False))
     )
-    messages = ContactMessage.objects.aggregate(unread=Count("id", filter=Q(is_read=False)), total=Count("id"))
+    messages = ContactMessage.objects.aggregate(
+        unread=Count("id", filter=Q(is_read=False)),
+        total=Count("id"),
+        quotes_unread=Count("id", filter=Q(is_read=False, kind=ContactMessage.Kind.QUOTE)),
+    )
     testimonials = Testimonial.objects.aggregate(
         published=Count("id", filter=Q(is_published=True)), total=Count("id")
     )
@@ -63,6 +68,7 @@ def admin_stats(request):
             "categories": Category.objects.count(),
             "messages_unread": messages["unread"],
             "messages_total": messages["total"],
+            "quotes_unread": messages["quotes_unread"],
             "testimonials_published": testimonials["published"],
             "testimonials_total": testimonials["total"],
             "latest_messages": LatestMessageSerializer(ContactMessage.objects.all()[:5], many=True).data,

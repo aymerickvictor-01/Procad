@@ -6,6 +6,7 @@ import ContactCard, { contactItems } from "../../components/ContactCard";
 import Container from "../../components/Container";
 import DomainGrid from "../../components/DomainGrid";
 import PageHero from "../../components/PageHero";
+import ResponsiveImage, { staticVariants } from "../../components/ResponsiveImage";
 import Reveal from "../../components/Reveal";
 import SectionHeader, { Eyebrow } from "../../components/SectionHeader";
 import { Skeleton } from "../../components/States";
@@ -67,8 +68,10 @@ export default function About() {
           </div>
 
           <Reveal className="aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
-            <img
+            <ResponsiveImage
               src={company.hero_image || "/images/fonds/services.jpg"}
+              variants={company.hero_image ? company.hero_image_variants : staticVariants("/images/fonds/services.jpg")}
+              sizes="(min-width: 1024px) 50vw, 100vw"
               alt={`Chantier ${company.name}`}
               className="size-full object-cover"
             />

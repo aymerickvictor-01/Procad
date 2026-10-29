@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 
+import ResponsiveImage from "./ResponsiveImage";
 import Reveal from "./Reveal";
 
 /** Tuile photo d'un domaine, menant à la liste de ses services. */
@@ -13,10 +14,10 @@ function DomainTile({ category, large = false }) {
       }`}
     >
       {category.image && (
-        <img
+        <ResponsiveImage
           src={category.image}
-          alt=""
-          loading="lazy"
+          variants={category.image_variants}
+          sizes={large ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"}
           className="absolute inset-0 -z-10 size-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
       )}

@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, FileEdit, FolderTree, Inbox, Layers, MessageSquareQuote, Plus } from "lucide-react";
+import { ArrowRight, Building2, FileEdit, FileText, FolderTree, Inbox, Layers, MessageSquareQuote, Plus } from "lucide-react";
 import { Link, useOutletContext } from "react-router";
 
 import AdminPage from "../../components/admin/AdminPage";
@@ -51,16 +51,23 @@ export default function Dashboard() {
         </>
       }
     >
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Services publiés" value={stats?.services_published} icon={Layers} to="/admin/services?is_published=true" />
         <StatCard label="Brouillons" value={stats?.services_draft} icon={FileEdit} to="/admin/services?is_published=false" />
         <StatCard label="Catégories" value={stats?.categories} icon={FolderTree} to="/admin/categories" />
         <StatCard
+          label="Devis non lus"
+          value={stats?.quotes_unread}
+          icon={FileText}
+          to="/admin/messages?kind=quote&is_read=false"
+          highlight={stats?.quotes_unread > 0}
+        />
+        <StatCard
           label="Messages non lus"
-          value={stats?.messages_unread}
+          value={stats && stats.messages_unread - stats.quotes_unread}
           icon={Inbox}
-          to="/admin/messages?is_read=false"
-          highlight={stats?.messages_unread > 0}
+          to="/admin/messages?kind=message&is_read=false"
+          highlight={stats?.messages_unread - stats?.quotes_unread > 0}
         />
         <StatCard
           label="Témoignages publiés"
@@ -72,7 +79,7 @@ export default function Dashboard() {
 
       <section className="mt-8 rounded-xl border border-gray-200 bg-white shadow-card">
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
-          <h2 className="font-display text-lg font-semibold text-gray-900">Derniers messages</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-900">Dernières demandes</h2>
           <Link to="/admin/messages" className="text-sm font-semibold text-primary hover:underline">
             Tout voir
           </Link>
@@ -98,8 +105,13 @@ export default function Dashboard() {
                     aria-label={message.is_read ? "Lu" : "Non lu"}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className={`truncate text-[15px] ${message.is_read ? "text-gray-700" : "font-semibold text-gray-900"}`}>
-                      {message.subject}
+                    <p className={`flex items-center gap-2 text-[15px] ${message.is_read ? "text-gray-700" : "font-semibold text-gray-900"}`}>
+                      {message.kind === "quote" && (
+                        <span className="shrink-0 rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] font-bold tracking-wide text-primary uppercase">
+                          Devis
+                        </span>
+                      )}
+                      <span className="truncate">{message.subject}</span>
                     </p>
                     <p className="truncate text-sm text-gray-500">{message.full_name}</p>
                   </div>

@@ -212,16 +212,44 @@ try {
     await shot("06-detail-public");
   });
 
-  await step("Contact : validation côté navigateur", async () => {
+  await step("Devis : contrôle de chaque étape", async () => {
     await page.click("Demander un devis");
     await page.waitFor(`location.pathname === "/contact"`);
     await page.waitFor(`__e2e.byLabel("Service concerné").value === ${JSON.stringify(serviceSlug)}`, { label: "le service présélectionné" });
-    await page.click("Envoyer le message");
-    await page.waitText("Indiquez votre nom.");
-    await page.waitText("Votre accord est nécessaire");
+    await page.click("Continuer");
+    await page.waitText("Choisissez le type de projet.");
+    await page.click("Rénovation ou modification", "label");
+    await page.click("Continuer");
+    await page.waitText("Décrivez votre projet");
+    await page.click("Continuer");
+    await page.waitText("Indiquez la ville ou le quartier du projet.");
+    await page.waitText("20 caractères minimum");
   });
 
-  await step("Contact : envoi d'un message", async () => {
+  await step("Devis : envoi avec une photo jointe", async () => {
+    await page.fill("Ville ou quartier du projet", "Yaoundé, Bastos");
+    await page.fill("Décrivez votre projet", "Demande de devis envoyée par les tests de bout en bout, avec une photo.");
+    await page.setFiles('input[type="file"]', [IMAGE]);
+    await page.waitText("image-test.png");
+    await page.click("Continuer");
+    await page.fill("Nom complet", "Visiteur E2E");
+    await page.fill("Téléphone", "695 00 00 00");
+    await page.fill("E-mail", "e2e@example.com");
+    await page.eval(`document.querySelector('input[type="checkbox"]').click();`);
+    await page.click("Continuer");
+    await page.waitText("Récapitulatif");
+    await page.waitText("Yaoundé, Bastos");
+    await shot("07-devis-recapitulatif");
+    await page.click("Envoyer ma demande");
+    await page.waitText("Demande envoyée");
+    await page.waitFor(`/DV-[2-9A-Z]{6}/.test(document.body.innerText)`, { label: "la référence du devis" });
+    await shot("08-devis-envoye");
+  });
+
+  await step("Contact : envoi d'une question simple", async () => {
+    await page.click("Question ou message", "[role=tab]");
+    await page.click("Envoyer le message");
+    await page.waitText("Indiquez votre nom.");
     await page.fill("Nom complet", "Visiteur E2E");
     await page.fill("E-mail", "e2e@example.com");
     await page.fill("Objet", SUBJECT);
@@ -238,10 +266,28 @@ try {
     await page.click(SUBJECT, "ul button");
     await page.waitText("e2e@example.com");
     await page.waitText("Marquer non lu");
-    await shot("07-messages");
+    await shot("09-messages");
+  });
+
+  await step("Messages : la demande de devis montre le projet et la photo jointe", async () => {
+    await page.goto(`${BASE}/admin/messages?kind=quote`);
+    await page.click("Demande de devis", "ul button");
+    await page.waitText("Yaoundé, Bastos");
+    await page.waitText("Rénovation ou modification");
+    await page.waitText("image-test.png");
+    await page.waitText("Répondre sur WhatsApp");
+    await page.waitFor(`[...document.querySelectorAll("article img")].some((img) => img.complete && img.naturalWidth > 0)`, {
+      label: "l'aperçu de la photo jointe",
+    });
+    await shot("10-devis-admin");
+    await page.click("Supprimer", "article button");
+    await confirmDialog("Supprimer");
+    await toast("Message supprimé.");
   });
 
   await step("Messages : suppression avec confirmation", async () => {
+    await page.goto(`${BASE}/admin/messages?kind=message`);
+    await page.click(SUBJECT, "ul button");
     await page.click("Supprimer", "article button");
     await confirmDialog("Supprimer");
     await toast("Message supprimé.");
@@ -257,7 +303,7 @@ try {
     await page.click("Enregistrer", "dialog[open] button");
     await toast("Témoignage créé.");
     await page.waitText("Client E2E");
-    await shot("08-temoignages");
+    await shot("11-temoignages");
     await page.clickSelector('[aria-label="Supprimer le témoignage de Client E2E"]');
     await confirmDialog("Supprimer");
     await toast("Témoignage supprimé.");
@@ -277,7 +323,7 @@ try {
     await page.fill("Slogan", "Slogan E2E");
     await page.click("Enregistrer", "form button");
     await toast("Profil de l'entreprise enregistré.");
-    await shot("09-entreprise");
+    await shot("12-entreprise");
     await page.fill("Slogan", original.slogan || " ");
     await page.click("Enregistrer", "form button");
   });
@@ -289,7 +335,7 @@ try {
     await page.fill("Confirmer", "Nouveau-Mot-De-Passe-2026!");
     await page.click("Modifier le mot de passe");
     await page.waitText("Le mot de passe actuel est incorrect.");
-    await shot("10-compte");
+    await shot("13-compte");
   });
 
   await step("Suppression du service avec confirmation", async () => {

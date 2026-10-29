@@ -2,6 +2,7 @@ import { ArrowRight, Layers } from "lucide-react";
 import { Link } from "react-router";
 
 import Logo from "./Logo";
+import ResponsiveImage from "./ResponsiveImage";
 import { useInView } from "./Reveal";
 
 /**
@@ -25,7 +26,12 @@ function DomainCard({ category }) {
     >
       <span className="size-14 shrink-0 overflow-hidden rounded-lg bg-night">
         {category.image ? (
-          <img src={category.image} alt="" loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          <ResponsiveImage
+            src={category.image}
+            variants={category.image_variants}
+            sizes="56px"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
         ) : (
           <Layers className="m-auto mt-4 size-6 text-ink-muted" aria-hidden="true" />
         )}

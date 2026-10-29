@@ -96,6 +96,42 @@ textes, points forts et photos (`backend/services/catalogue/`). Sans `--update`,
 déjà présents ne sont jamais modifiés : les corrections faites dans l'administration sont
 conservées. À lancer aussi sur le serveur après la mise en ligne.
 
+### Demandes de devis, WhatsApp et alertes par e-mail
+
+- **WhatsApp** : bouton flottant sur tout le site et sur chaque fiche service, avec un message
+  pré-rempli. Le numéro est celui du champ « WhatsApp » du profil de l'entreprise
+  (administration > Entreprise).
+- **Demande de devis** (page Contact) : 4 étapes, jusqu'à 5 photos ou PDF (20 Mo au total).
+  Chaque demande reçoit une référence (`DV-XXXXXX`). Les pièces jointes sont stockées hors du
+  dossier public (`/app/private`, volume `private_data`) et ne se téléchargent que depuis
+  l'administration ; les photos sont réduites et débarrassées de leurs métadonnées (GPS).
+- **Alertes** : chaque demande envoie un e-mail à `DJANGO_NOTIFY_EMAILS` (pièces jointes et
+  lien WhatsApp vers le client inclus) et un accusé de réception au client s'il a laissé son
+  e-mail. Sans `DJANGO_EMAIL_HOST`, les e-mails s'affichent dans `docker compose logs backend`.
+
+**Activer l'envoi réel avec Gmail** (compte camerinfos18@gmail.com) :
+
+1. Sur https://myaccount.google.com/security, activer la **validation en deux étapes**.
+2. Sur https://myaccount.google.com/apppasswords, créer un **mot de passe d'application**
+   (nom : « Site PROCAD ») : Google affiche 16 lettres.
+3. Dans `.env` :
+   ```
+   DJANGO_EMAIL_HOST=smtp.gmail.com
+   DJANGO_EMAIL_HOST_USER=camerinfos18@gmail.com
+   DJANGO_EMAIL_HOST_PASSWORD=les16lettressansespaces
+   DJANGO_DEFAULT_FROM_EMAIL=PROCAD <camerinfos18@gmail.com>
+   ```
+4. `docker compose up -d backend`, puis envoyer une demande de test depuis le site.
+
+Ne jamais mettre le mot de passe Gmail habituel : le mot de passe d'application peut être
+révoqué à tout moment sans toucher au compte.
+
+Images déjà en ligne avant l'ajout des versions allégées (ou après une restauration) :
+
+```bash
+docker compose exec backend python manage.py generate_image_variants
+```
+
 ### Données de démonstration (tests uniquement)
 
 ```bash
@@ -115,9 +151,10 @@ node e2e/scenario.mjs
 ```
 
 Pilote Microsoft Edge sans interface (aucune dépendance à installer : Node 22 + Edge) et
-déroule 22 parcours réels : connexion, création d'une catégorie puis d'un service avec image
-et points forts, publication, affichage public, envoi d'un message de contact, lecture et
-suppression dans l'admin, témoignage, profil de l'entreprise, mot de passe, session expirée.
+déroule 24 parcours réels : connexion, création d'une catégorie puis d'un service avec image
+et points forts, publication, affichage public, demande de devis en 4 étapes avec photo jointe,
+question simple, lecture et suppression dans l'admin (projet, pièce jointe), témoignage, profil
+de l'entreprise, mot de passe, session expirée.
 Un compte administrateur temporaire est créé puis supprimé, ainsi que toutes les données de
 test ; le slogan de l'entreprise est restauré. Captures d'écran : `e2e/resultats/`.
 Autre navigateur Chromium : variable `E2E_BROWSER` (chemin de l'exécutable).
@@ -151,7 +188,7 @@ npx newman run postman/vitrine.postman_collection.json -e postman/local.postman_
 | GET  | `/api/services/` | Services publiés — `category`, `search`, `featured=true`, `page`, `page_size` |
 | GET  | `/api/services/{slug}/` | Détail d'un service publié |
 | GET  | `/api/testimonials/` | Témoignages publiés — `service` (slug) |
-| POST | `/api/contact/` | Message de contact (5 par heure et par IP) |
+| POST | `/api/contact/` | Message (`kind=message`) ou demande de devis (`kind=quote`, multipart avec `attachments`) — 5 par heure et par IP ; renvoie la référence |
 
 ## Authentification (session + CSRF)
 
@@ -183,9 +220,12 @@ Codes : **401** = non connecté, **403** = connecté sans les droits (ou jeton C
 | GET / POST | `/api/admin/testimonials/` | Filtres `is_published`, `service` (id) |
 | GET / PUT / PATCH / DELETE | `/api/admin/testimonials/{id}/` | |
 | GET | `/api/admin/messages/` | Du plus récent au plus ancien — filtre `is_read` |
-| GET / PATCH / DELETE | `/api/admin/messages/{id}/` | PATCH limité à `is_read` |
+| GET / PATCH / DELETE | `/api/admin/messages/{id}/` | PATCH limité à `is_read` — filtres `kind`, `is_read` |
+| GET | `/api/admin/messages/{id}/attachments/{id}/` | Pièce jointe (téléchargement ; `?inline=1` pour afficher une image) |
 
 Images : JPEG, PNG ou WebP, 5 Mo maximum. Envoyer `null` (JSON) pour retirer une image.
+Chaque image reçoit des versions WebP allégées (480, 960 et 1600 px de large) renvoyées dans les
+champs `*_variants` : le site les utilise pour ne télécharger que la taille utile à l'écran.
 
 Documentation interactive complète : http://localhost:8000/api/docs/
 

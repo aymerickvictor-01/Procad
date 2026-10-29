@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir --retries 10 --timeout 60 -r requirements.txt
 COPY . .
 
 # Dossiers d'écriture + utilisateur non-root
-RUN mkdir -p /app/staticfiles /app/media \
+RUN mkdir -p /app/staticfiles /app/media /app/private \
     && useradd -m appuser \
     && chown -R appuser /app
 USER appuser

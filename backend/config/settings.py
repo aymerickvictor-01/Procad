@@ -121,10 +121,42 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Fichiers privés (pièces jointes des demandes de devis) : jamais servis par Nginx,
+# téléchargeables uniquement depuis l'administration (vue protégée).
+PRIVATE_MEDIA_ROOT = BASE_DIR / "private"
+
+# Pièces jointes d'une demande de devis : 5 fichiers, 10 Mo chacun, 20 Mo au total
+CONTACT_ATTACHMENTS_MAX_FILES = 5
+CONTACT_ATTACHMENT_MAX_SIZE = 10 * 1024 * 1024
+CONTACT_ATTACHMENTS_MAX_TOTAL = 20 * 1024 * 1024
+
 # Taille maximale d'une image téléversée (logo, couverture, galerie, photo)
 MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024
 # Côté le plus long d'une image après optimisation (les images plus grandes sont réduites)
 IMAGE_MAX_SIDE = 1920
+
+# --- E-mails ------------------------------------------------------------------
+#
+# Alerte à chaque nouvelle demande (DJANGO_NOTIFY_EMAILS) et accusé de réception au visiteur.
+# Sans serveur SMTP configuré (DJANGO_EMAIL_HOST vide), les e-mails sont affichés dans les
+# journaux du conteneur backend au lieu d'être envoyés : pratique en développement.
+
+EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST", "")
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST else "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "1") == "1"
+EMAIL_TIMEOUT = 20
+DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL") or EMAIL_HOST_USER or "webmaster@localhost"
+NOTIFY_EMAILS = env_list("DJANGO_NOTIFY_EMAILS")
+# Envoi en arrière-plan : la réponse au visiteur n'attend pas le serveur SMTP (désactivé en test).
+EMAIL_ASYNC = True
+
+# Adresse publique du site, pour les liens dans les e-mails (ex. https://procad.com)
+SITE_URL = os.environ.get("DJANGO_SITE_URL", "http://localhost:5174").rstrip("/")
 
 # --- Django REST Framework ----------------------------------------------------
 

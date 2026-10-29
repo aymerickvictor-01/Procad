@@ -40,9 +40,9 @@ $COMPOSE exec -T db sh -c \
     'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --single-transaction' \
     < "$source_dir/db.dump"
 
-log "Restauration des images (media)"
+log "Restauration des images et des pièces jointes"
 $COMPOSE run --rm --no-deps -T backend \
-    sh -c 'find /app/media -mindepth 1 -delete && tar -xzf - -C /app' \
+    sh -c 'find /app/media /app/private -mindepth 1 -delete && tar -xzf - -C /app' \
     < "$source_dir/media.tar.gz"
 
 log "Restauration terminée"

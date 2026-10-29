@@ -2,7 +2,8 @@ from django.db import transaction
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from common.serializers import BaseModelSerializer
+from common.images import existing_variants
+from common.serializers import BaseModelSerializer, ImageVariantsField
 
 from .models import Category, Service, ServiceFeature, ServiceImage
 
@@ -12,16 +13,25 @@ class CategorySerializer(BaseModelSerializer):
     image = serializers.SerializerMethodField(
         help_text="Couverture du premier service publié de la catégorie (illustration), ou null."
     )
+    image_variants = serializers.SerializerMethodField(help_text="Versions WebP allégées de `image`.")
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "description", "service_count", "image"]
+        fields = ["id", "name", "slug", "description", "service_count", "image", "image_variants"]
+
+    def _cover(self, category):
+        # Liste préchargée par CategoryListView (services publiés avec couverture, dans l'ordre).
+        services = category.illustrated_services
+        return services[0].cover_image if services else None
 
     @extend_schema_field(serializers.CharField(allow_null=True))
     def get_image(self, category):
-        # Liste préchargée par CategoryListView (services publiés avec couverture, dans l'ordre).
-        services = category.illustrated_services
-        return services[0].cover_image.url if services else None
+        cover = self._cover(category)
+        return cover.url if cover else None
+
+    @extend_schema_field(ImageVariantsField())
+    def get_image_variants(self, category):
+        return existing_variants(self._cover(category))
 
 
 class CategoryRefSerializer(BaseModelSerializer):
@@ -39,19 +49,22 @@ class ServiceRefSerializer(BaseModelSerializer):
 
 
 class ServiceImageSerializer(BaseModelSerializer):
+    image_variants = ImageVariantsField(source="image")
+
     class Meta:
         model = ServiceImage
-        fields = ["id", "image", "alt_text"]
+        fields = ["id", "image", "image_variants", "alt_text"]
 
 
 class ServiceListSerializer(BaseModelSerializer):
     category = CategoryRefSerializer(read_only=True)
+    cover_image_variants = ImageVariantsField(source="cover_image")
 
     class Meta:
         model = Service
         fields = [
             "id", "title", "slug", "category", "short_description",
-            "cover_image", "price_label", "is_featured",
+            "cover_image", "cover_image_variants", "price_label", "is_featured",
         ]
 
 

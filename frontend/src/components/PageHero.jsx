@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 
 import Container from "./Container";
+import ResponsiveImage, { staticVariants } from "./ResponsiveImage";
 import { Eyebrow } from "./SectionHeader";
 
 /** Fil d'Ariane : [{ to, label }, ..., { label }] — le dernier élément est la page courante. */
@@ -29,10 +30,17 @@ export function Breadcrumb({ items }) {
 }
 
 /** Photo de fond voilée de bleu marine : plus sombre à gauche, là où se trouve le texte. */
-export function PhotoBackground({ image, zoom = false, className = "" }) {
+export function PhotoBackground({ image, variants, zoom = false, lazy = false, className = "" }) {
+  // Photos fournies avec le site : versions WebP générées à côté (public/images/fonds).
+  const sources = variants ?? (image?.startsWith("/images/fonds/") ? staticVariants(image) : undefined);
   return (
     <div aria-hidden="true" className={`absolute inset-0 -z-10 overflow-hidden ${className}`}>
-      {image && <img src={image} alt="" className={`size-full object-cover ${zoom ? "animate-hero-zoom" : ""}`} />}
+      <ResponsiveImage
+        src={image}
+        variants={sources}
+        priority={!lazy}
+        className={`size-full object-cover ${zoom ? "animate-hero-zoom" : ""}`}
+      />
       <div className="absolute inset-0 bg-gradient-to-r from-night/95 via-night/75 to-night/30" />
       <div className="absolute inset-0 bg-gradient-to-t from-night/60 to-transparent" />
     </div>
@@ -40,10 +48,18 @@ export function PhotoBackground({ image, zoom = false, className = "" }) {
 }
 
 /** En-tête des pages intérieures, sur photo. */
-export default function PageHero({ eyebrow, title, description, breadcrumb, image = "/images/fonds/pages.jpg", children }) {
+export default function PageHero({
+  eyebrow,
+  title,
+  description,
+  breadcrumb,
+  image = "/images/fonds/pages.jpg",
+  imageVariants,
+  children,
+}) {
   return (
     <section className="relative isolate overflow-hidden bg-night text-ink">
-      <PhotoBackground image={image} zoom />
+      <PhotoBackground image={image} variants={imageVariants} zoom />
       <Container className="relative py-14 sm:py-20">
         {breadcrumb && <Breadcrumb items={breadcrumb} />}
         {eyebrow && (

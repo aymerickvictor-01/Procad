@@ -10,6 +10,7 @@ __pycache__/
 venv/
 .venv/
 backend/media/
+backend/private/
 backend/staticfiles/
 .pytest_cache/
 .coverage

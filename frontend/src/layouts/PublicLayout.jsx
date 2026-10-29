@@ -3,6 +3,8 @@ import { Outlet, useLocation } from "react-router";
 
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import WhatsAppButton from "../components/WhatsAppButton";
+import { WhatsAppProvider } from "../context/WhatsAppContext";
 
 export default function PublicLayout() {
   const { pathname } = useLocation();
@@ -13,18 +15,21 @@ export default function PublicLayout() {
   }, [pathname]);
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <a
-        href="#contenu"
-        className="sr-only z-[100] rounded-full bg-primary px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
-      >
-        Aller au contenu
-      </a>
-      <Navbar />
-      <main id="contenu" className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <WhatsAppProvider>
+      <div className="flex min-h-dvh flex-col">
+        <a
+          href="#contenu"
+          className="sr-only z-[100] rounded-full bg-primary px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        >
+          Aller au contenu
+        </a>
+        <Navbar />
+        <main id="contenu" className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </div>
+    </WhatsAppProvider>
   );
 }

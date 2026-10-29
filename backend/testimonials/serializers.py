@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from common.serializers import BaseModelSerializer
+from common.serializers import BaseModelSerializer, ImageVariantsField
 from services.serializers import ServiceRefSerializer
 
 from .models import Testimonial
@@ -9,10 +9,13 @@ from .models import Testimonial
 
 class TestimonialSerializer(BaseModelSerializer):
     service = serializers.SerializerMethodField()
+    photo_variants = ImageVariantsField(source="photo")
 
     class Meta:
         model = Testimonial
-        fields = ["id", "author_name", "author_role", "content", "rating", "photo", "service", "created_at"]
+        fields = [
+            "id", "author_name", "author_role", "content", "rating", "photo", "photo_variants", "service", "created_at",
+        ]
 
     @extend_schema_field(ServiceRefSerializer(allow_null=True))
     def get_service(self, obj):
