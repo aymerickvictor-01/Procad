@@ -79,7 +79,7 @@ function Description({ text }) {
         <ul className="mt-3 space-y-2">
           {bullets.map((line) => (
             <li key={line} className="flex gap-3">
-              <span className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+              <span className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
               <span>{line.replace(BULLET, "").replace(/\s*[;.]$/, "")}</span>
             </li>
           ))}

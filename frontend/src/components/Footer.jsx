@@ -15,7 +15,7 @@ export default function Footer() {
   const address = [company.address, company.city, company.country].filter(Boolean).join(", ");
 
   return (
-    <footer className="relative overflow-hidden border-t-4 border-accent bg-night text-ink-tertiary">
+    <footer className="relative overflow-hidden bg-night text-ink-tertiary">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr_1fr]">
         <div>
           <Logo framed imageClassName="h-14" />

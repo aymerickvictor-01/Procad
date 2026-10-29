@@ -17,7 +17,7 @@ const LINKS = [
 // Lien actif : texte bleu et filet rouge sous le libellé.
 function desktopLinkClass({ isActive }) {
   return `relative px-1 py-2 text-[15px] font-semibold transition-colors after:absolute after:inset-x-1 after:-bottom-[20px] after:h-0.5 ${
-    isActive ? "text-primary after:bg-accent" : "text-gray-700 after:bg-transparent hover:text-primary"
+    isActive ? "text-primary after:bg-primary" : "text-gray-700 after:bg-transparent hover:text-primary"
   }`;
 }
 

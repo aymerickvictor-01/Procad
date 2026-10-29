@@ -1,11 +1,12 @@
 import { ArrowRight, Phone } from "lucide-react";
-import { Link } from "react-router";
 
 import { getCategories, getServices, getTestimonials } from "../../api/public";
 import Button from "../../components/Button";
 import ContactCard, { contactItems } from "../../components/ContactCard";
 import Container from "../../components/Container";
+import DomainsDiagram from "../../components/DomainsDiagram";
 import { PhotoBackground } from "../../components/PageHero";
+import Reveal, { CountUp, useInView } from "../../components/Reveal";
 import SectionHeader, { Eyebrow } from "../../components/SectionHeader";
 import ServiceCard, { ServiceCardSkeleton } from "../../components/ServiceCard";
 import { EmptyState, ErrorState } from "../../components/States";
@@ -39,15 +40,19 @@ function Hero({ company }) {
 
   return (
     <section className="relative isolate overflow-hidden bg-night text-ink">
-      <PhotoBackground image={company.hero_image || DEFAULT_HERO} />
+      <PhotoBackground image={company.hero_image || DEFAULT_HERO} zoom />
       <Container className="relative flex min-h-[560px] flex-col justify-center pt-16 pb-32 sm:min-h-[620px] sm:pt-20 sm:pb-36">
         <div className="max-w-2xl">
-          <Eyebrow dark>Entreprise pluridisciplinaire</Eyebrow>
-          <h1 className="mt-5 text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-white sm:text-5xl lg:text-[60px]">
+          <Eyebrow dark className="animate-fade-up">
+            Entreprise pluridisciplinaire
+          </Eyebrow>
+          <h1 style={{ "--delay": "120ms" }} className="animate-fade-up mt-5 text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-white sm:text-5xl lg:text-[60px]">
             {title}
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-secondary">{pitch}</p>
-          <div className="mt-9 flex flex-wrap gap-3">
+          <p style={{ "--delay": "240ms" }} className="animate-fade-up mt-6 max-w-xl text-lg leading-relaxed text-ink-secondary">
+            {pitch}
+          </p>
+          <div style={{ "--delay": "360ms" }} className="animate-fade-up mt-9 flex flex-wrap gap-3">
             <Button to="/services" size="lg">
               Découvrir nos services <ArrowRight className="size-4" aria-hidden="true" />
             </Button>
@@ -74,12 +79,17 @@ function KeyFigures({ serviceCount, categoryCount, rating, ratingCount }) {
   return (
     <section className="relative z-10 -mt-20">
       <Container>
-        <div className="grid overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card-hover md:grid-cols-[1fr_auto]">
+        <div
+          style={{ "--delay": "480ms" }}
+          className="animate-fade-up grid overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card-hover md:grid-cols-[1fr_auto]"
+        >
           <dl className="grid grid-cols-2 divide-x divide-gray-200 sm:flex">
             {figures.map(({ value, label }) => (
               <div key={label} className="flex flex-col px-6 py-6 sm:flex-1 sm:px-9 sm:py-7">
                 <dt className="order-2 mt-1 text-sm text-gray-500">{label}</dt>
-                <dd className="order-1 font-display text-4xl font-bold tracking-[-0.02em] text-primary">{value}</dd>
+                <dd className="order-1 font-display text-4xl font-bold tracking-[-0.02em] text-primary">
+                  {typeof value === "number" ? <CountUp value={value} /> : value}
+                </dd>
               </div>
             ))}
           </dl>
@@ -97,55 +107,20 @@ function KeyFigures({ serviceCount, categoryCount, rating, ratingCount }) {
   );
 }
 
-/* --- Domaines d'expertise : tuiles photo ---------------------------------------- */
+/* --- Organisation : schéma de l'entreprise et de ses domaines ----------------------- */
 
-function DomainTile({ category, large = false }) {
-  return (
-    <Link
-      to={`/services?category=${category.slug}`}
-      className={`group relative isolate flex min-h-[190px] flex-col justify-end overflow-hidden rounded-xl bg-night p-4 text-white sm:min-h-[240px] sm:p-6 lg:min-h-[280px] ${
-        large ? "col-span-2 sm:p-8" : ""
-      }`}
-    >
-      {category.image && (
-        <img
-          src={category.image}
-          alt=""
-          loading="lazy"
-          className="absolute inset-0 -z-10 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      )}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/60 to-night/5" />
-      <span aria-hidden="true" className="mb-3 h-1 w-8 bg-accent transition-all duration-300 group-hover:w-16 sm:mb-4 sm:w-10" />
-      <h3 className={`font-bold tracking-[-0.01em] ${large ? "text-2xl sm:text-[28px]" : "text-[15px] leading-snug sm:text-lg"}`}>{category.name}</h3>
-      {large && category.description && (
-        <p className="mt-2 max-w-md text-[15px] leading-relaxed text-ink-secondary">{category.description}</p>
-      )}
-      <p className="mt-2 flex items-center gap-1.5 text-sm text-ink-tertiary group-hover:text-white">
-        {category.service_count} {category.service_count > 1 ? "services" : "service"}
-        <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-      </p>
-    </Link>
-  );
-}
-
-function Domains({ categories }) {
+function Organisation({ categories, serviceCount }) {
   if (!categories.length) return null;
-  const [first, ...others] = categories;
   return (
-    <section className="py-20 sm:py-24">
+    <section className="overflow-hidden py-20 sm:py-24">
       <Container>
         <SectionHeader
-          eyebrow="Nos domaines d'expertise"
-          title="Du plan à la remise des clés"
-          description="Nos équipes couvrent l'ensemble des corps de métier du bâtiment, de l'industrie et de la communication."
+          center
+          eyebrow="Notre organisation"
+          title={`Une entreprise, ${categories.length} domaines d'expertise`}
+          description="Des études à la communication, nos équipes couvrent tous les métiers de vos projets. Choisissez un domaine pour découvrir ses services."
         />
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          <DomainTile category={first} large />
-          {others.map((category) => (
-            <DomainTile key={category.slug} category={category} />
-          ))}
-        </div>
+        <DomainsDiagram categories={categories} serviceCount={serviceCount} />
       </Container>
     </section>
   );
@@ -185,8 +160,10 @@ function FeaturedServices({ state }) {
           />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {data.results.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+            {data.results.map((service, index) => (
+              <Reveal key={service.id} delay={(index % 3) * 100} className="flex *:w-full">
+                <ServiceCard service={service} />
+              </Reveal>
             ))}
           </div>
         )}
@@ -205,32 +182,42 @@ const STEPS = [
 ];
 
 function Method() {
+  const [ref, inView] = useInView();
   return (
     <section className="py-20 sm:py-24">
       <Container className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <div className="relative">
-          <span aria-hidden="true" className="absolute -top-3 -left-3 hidden h-32 w-32 border-t-4 border-l-4 border-accent lg:block" />
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
-            <img
-              src="/images/fonds/a-propos.jpg"
-              alt="Ingénieurs échangeant sur un chantier"
-              loading="lazy"
-              className="size-full object-cover"
-            />
-          </div>
-        </div>
+        <Reveal className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
+          <img
+            src="/images/fonds/a-propos.jpg"
+            alt="Ingénieurs échangeant sur un chantier"
+            loading="lazy"
+            className="size-full object-cover"
+          />
+        </Reveal>
         <div>
           <Eyebrow>Notre méthode</Eyebrow>
           <h2 className="mt-3 text-3xl leading-tight font-bold tracking-[-0.02em] text-gray-900 sm:text-4xl">
             Un interlocuteur, du premier rendez-vous à la réception
           </h2>
-          <ol className="mt-8 space-y-6">
+          <ol ref={ref} className="relative mt-9 space-y-7">
+            {/* Frise : trait gris, rempli de bleu à l'apparition */}
+            <span aria-hidden="true" className="absolute top-3 bottom-3 left-[21px] w-0.5 bg-gray-200" />
+            <span
+              aria-hidden="true"
+              className={`absolute top-3 bottom-3 left-[21px] w-0.5 origin-top bg-primary transition-transform duration-[1600ms] ease-out ${
+                inView ? "scale-y-100" : "scale-y-0"
+              }`}
+            />
             {STEPS.map(([title, text], index) => (
-              <li key={title} className="flex gap-5">
-                <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary font-display text-lg font-bold text-white">
+              <li
+                key={title}
+                style={{ "--delay": `${index * 250}ms` }}
+                className={`reveal relative flex gap-5 ${inView ? "is-visible" : ""}`}
+              >
+                <span className="relative grid size-11 shrink-0 place-items-center rounded-full bg-primary font-display text-lg font-bold text-white ring-4 ring-white">
                   {index + 1}
                 </span>
-                <div>
+                <div className="pt-1.5">
                   <h3 className="text-lg font-bold text-gray-900">{title}</h3>
                   <p className="mt-1 text-[15px] leading-relaxed text-gray-600">{text}</p>
                 </div>
@@ -277,8 +264,10 @@ function Testimonials({ testimonials }) {
       <Container>
         <SectionHeader eyebrow="Témoignages" title="Ils nous font confiance" />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.slice(0, 6).map((testimonial) => (
-            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+          {testimonials.slice(0, 6).map((testimonial, index) => (
+            <Reveal key={testimonial.id} delay={(index % 3) * 100}>
+              <TestimonialCard testimonial={testimonial} />
+            </Reveal>
           ))}
         </div>
       </Container>
@@ -292,9 +281,8 @@ function FinalCta({ company }) {
   return (
     <section className="py-20 sm:py-24">
       <Container>
-        <div className="relative isolate overflow-hidden rounded-xl bg-night px-6 py-14 sm:px-12 sm:py-16">
+        <Reveal className="relative isolate overflow-hidden rounded-xl bg-night px-6 py-14 sm:px-12 sm:py-16">
           <PhotoBackground image="/images/fonds/projet.jpg" />
-          <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-accent" />
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <Eyebrow dark>Contact</Eyebrow>
@@ -316,7 +304,7 @@ function FinalCta({ company }) {
               )}
             </div>
           </div>
-        </div>
+        </Reveal>
       </Container>
     </section>
   );
@@ -352,7 +340,7 @@ export default function Home() {
         rating={rating}
         ratingCount={ratingCount}
       />
-      <Domains categories={activeCategories} />
+      <Organisation categories={activeCategories} serviceCount={allServices.data?.count ?? 0} />
       <FeaturedServices state={featured} />
       <Method />
       <About company={company} />

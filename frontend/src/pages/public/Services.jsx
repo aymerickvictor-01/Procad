@@ -7,6 +7,7 @@ import Button from "../../components/Button";
 import Container from "../../components/Container";
 import PageHero from "../../components/PageHero";
 import Pagination from "../../components/Pagination";
+import Reveal from "../../components/Reveal";
 import ServiceCard, { ServiceCardSkeleton } from "../../components/ServiceCard";
 import { EmptyState, ErrorState } from "../../components/States";
 import useApi from "../../hooks/useApi";
@@ -194,8 +195,10 @@ export default function Services() {
             ) : (
               <>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {services.data.results.map((service) => (
-                    <ServiceCard key={service.id} service={service} />
+                  {services.data.results.map((service, index) => (
+                    <Reveal key={service.id} delay={(index % 3) * 90} className="flex *:w-full">
+                      <ServiceCard service={service} />
+                    </Reveal>
                   ))}
                 </div>
                 <Pagination page={page} count={services.data.count} pageSize={PAGE_SIZE} onChange={changePage} />

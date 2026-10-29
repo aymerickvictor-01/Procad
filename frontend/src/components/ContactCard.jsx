@@ -35,7 +35,7 @@ export default function ContactCard({ company, title = "Nous joindre", className
   if (!items.length) return null;
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border-t-4 border-accent bg-night p-7 text-ink shadow-card-hover sm:p-8 ${className}`}>
+    <div className={`relative overflow-hidden rounded-xl bg-night p-7 text-ink shadow-card-hover sm:p-8 ${className}`}>
       <p className="font-display text-xl font-semibold text-white">{title}</p>
       <ul className="mt-6 space-y-5">
         {items.map(({ icon: Icon, label, value, href, external }) => (

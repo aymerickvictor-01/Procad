@@ -26,15 +26,14 @@ export default function SectionHeader({ eyebrow, title, description, action, dar
   );
 }
 
-/** Sur-titre : petit libellé en capitales précédé d'un filet rouge PROCAD. */
+/** Sur-titre : petit libellé en capitales. */
 export function Eyebrow({ dark = false, className = "", children }) {
   return (
     <span
-      className={`inline-flex items-center gap-2.5 text-[12px] font-semibold tracking-[0.12em] uppercase ${
+      className={`inline-flex items-center text-[12px] font-semibold tracking-[0.12em] uppercase ${
         dark ? "text-ink-tertiary" : "text-primary"
       } ${className}`}
     >
-      <span aria-hidden="true" className="h-0.5 w-6 bg-accent" />
       {children}
     </span>
   );

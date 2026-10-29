@@ -58,7 +58,7 @@ export default function AdminLogin() {
       <meta name="robots" content="noindex" />
 
       {/* Panneau de marque */}
-      <div className="relative isolate hidden overflow-hidden border-r-4 border-accent bg-night p-12 text-ink lg:flex lg:flex-col lg:justify-between">
+      <div className="relative isolate hidden overflow-hidden bg-night p-12 text-ink lg:flex lg:flex-col lg:justify-between">
         <PhotoBackground image="/images/fonds/accueil.jpg" />
         <Logo framed className="relative self-start" imageClassName="h-16" />
         <div className="relative">
