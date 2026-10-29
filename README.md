@@ -23,37 +23,62 @@ e2e/         Tests de bout en bout dans le navigateur
 docs/        Guide de déploiement (deploiement.md), logo (docs/brand/)
 ```
 
-## Prérequis
+## Installation sur un nouvel ordinateur
 
-- Docker Desktop (avec Docker Compose)
-- Git
-- Node.js 22 LTS et Python 3.12 (facultatifs : tout tourne dans Docker)
+Seul **Docker Desktop** est nécessaire (Python, Node.js et PostgreSQL tournent dans des conteneurs).
 
-## Démarrage en développement
+1. Installer [Docker Desktop](https://www.docker.com/products/docker-desktop/) et [Git](https://git-scm.com/),
+   puis démarrer Docker Desktop (attendre « Engine running »).
+2. Récupérer le code :
+   ```bash
+   git clone https://github.com/aymerickvictor-01/Procad.git
+   cd Procad
+   ```
+3. Lancer l'installation :
+   - **Windows** : double-cliquer sur `installer.cmd` ;
+   - **Linux / macOS** : `scripts/installer.sh`.
 
-```bash
-cp .env.example .env          # puis renseigner les valeurs
-docker compose up --build
-```
+Le script vérifie Docker, crée le fichier `.env` avec des mots de passe aléatoires, construit et
+démarre les conteneurs (base migrée automatiquement), propose de charger les données de
+démonstration et de créer le compte administrateur, puis affiche les adresses ci-dessous.
+La première installation télécharge environ 1,5 Go : compter 10 à 20 minutes selon la connexion.
+Il peut être relancé sans risque (le `.env` et les données existants sont conservés).
 
 | Adresse                          | Contenu                     |
 |----------------------------------|-----------------------------|
-| http://localhost:5174            | Site (React) — 5174 car le 5173 est pris par un autre projet |
+| http://localhost:5174            | Site (React)                |
+| http://localhost:5174/admin      | Espace administrateur       |
 | http://localhost:8000/api/docs/  | Documentation de l'API      |
 | http://localhost:8000/django-admin/ | Admin Django (secours)   |
-| http://localhost:5050            | pgAdmin (identifiants : `PGADMIN_EMAIL` / `PGADMIN_PASSWORD`) |
+| http://localhost:5050            | pgAdmin (identifiants : `PGADMIN_EMAIL` / `PGADMIN_PASSWORD` du `.env`) |
 | http://localhost:8000/api/health/ | État de l'API et de la base |
-| `localhost:5433`                 | PostgreSQL depuis le PC (5433 pour ne pas entrer en conflit avec un PostgreSQL local) |
+| `localhost:5433`                 | PostgreSQL depuis le PC     |
 
-Premier lancement, dans un second terminal :
+Un port déjà utilisé sur la machine se change dans `.env` (`FRONTEND_PORT`, `BACKEND_PORT`,
+`PGADMIN_PORT`, `DB_PORT`), puis `docker compose up -d`.
+
+### Utilisation au quotidien
 
 ```bash
-docker compose exec backend python manage.py migrate
-docker compose exec backend python manage.py createcachetable
-docker compose exec backend python manage.py createsuperuser
+docker compose up -d       # démarrer (Docker Desktop doit tourner)
+docker compose stop        # arrêter (données conservées)
+docker compose logs -f backend frontend   # voir les journaux
+docker compose exec backend python manage.py createsuperuser   # autre compte administrateur
 ```
 
-Tests automatiques du back-end :
+### Transférer les données d'un ordinateur à l'autre
+
+Le code passe par GitHub, mais pas les données (services saisis, images, comptes). Pour les
+reprendre sur la nouvelle machine, depuis Git Bash ou un terminal Linux / macOS :
+
+```bash
+# Ancien ordinateur
+PROCAD_COMPOSE="docker compose" scripts/backup.sh        # crée backups/AAAA-MM-JJ_HHMMSS/
+# Copier ce dossier dans backups/ du nouvel ordinateur (clé USB, cloud...), puis, après l'installation :
+PROCAD_COMPOSE="docker compose" scripts/restore.sh backups/AAAA-MM-JJ_HHMMSS
+```
+
+### Tests automatiques du back-end
 
 ```bash
 docker compose exec backend python manage.py test

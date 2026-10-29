@@ -21,6 +21,10 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
+if DEBUG:
+    # Le serveur Vite suit FRONTEND_PORT (docker-compose.yml) : son origine est toujours acceptée.
+    _vite_port = os.environ.get("FRONTEND_PORT", "5174")
+    CSRF_TRUSTED_ORIGINS += [f"http://localhost:{_vite_port}", f"http://127.0.0.1:{_vite_port}"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",

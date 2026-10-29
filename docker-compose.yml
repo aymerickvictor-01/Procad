@@ -1,5 +1,9 @@
 # Environnement de DÉVELOPPEMENT : db, pgadmin, backend, frontend.
-# Lancer : docker compose up --build
+# Installation sur un nouvel ordinateur : scripts/installer.ps1 (Windows) ou scripts/installer.sh.
+# Ensuite : docker compose up -d
+#
+# Ports côté PC modifiables dans .env (DB_PORT, PGADMIN_PORT, BACKEND_PORT, FRONTEND_PORT)
+# si l'un d'eux est déjà pris sur la machine.
 
 services:
   db:
@@ -11,8 +15,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      # 5433 côté PC : le 5432 est déjà pris par le PostgreSQL installé sur Windows
-      - "127.0.0.1:5433:5432"
+      # 5433 par défaut : évite le conflit avec un PostgreSQL déjà installé sur le PC
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -25,7 +29,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
-      - "127.0.0.1:5050:80"
+      - "127.0.0.1:${PGADMIN_PORT:-5050}:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       # Serveur PROCAD pré-enregistré (lu au premier démarrage de pgAdmin)
@@ -35,13 +39,17 @@ services:
 
   backend:
     build: ./backend
-    command: python manage.py runserver 0.0.0.0:8000
+    # Base à jour et table de cache créée à chaque démarrage, puis serveur de développement.
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py createcachetable &&
+             python manage.py runserver 0.0.0.0:8000"
     env_file: .env
     volumes:
       - ./backend:/app # rechargement automatique du code
       - media_data:/app/media
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -57,8 +65,8 @@ services:
       - ./frontend:/app
       - /app/node_modules # garde les modules installés dans le conteneur
     ports:
-      # 5174 : le 5173 est déjà utilisé par un autre projet sur le PC
-      - "127.0.0.1:5174:5174"
+      # 5174 par défaut (le 5173 habituel de Vite est souvent pris par un autre projet)
+      - "127.0.0.1:${FRONTEND_PORT:-5174}:5174"
     depends_on:
       - backend
 

@@ -8,3 +8,6 @@
 *.webp binary
 *.ico binary
 *.pdf binary
+# Scripts Windows : fins de ligne CRLF
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
