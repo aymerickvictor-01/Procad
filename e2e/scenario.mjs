@@ -213,7 +213,7 @@ try {
   });
 
   await step("Contact : validation côté navigateur", async () => {
-    await page.click("Demander des informations");
+    await page.click("Demander un devis");
     await page.waitFor(`location.pathname === "/contact"`);
     await page.waitFor(`__e2e.byLabel("Service concerné").value === ${JSON.stringify(serviceSlug)}`, { label: "le service présélectionné" });
     await page.click("Envoyer le message");

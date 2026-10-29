@@ -11,6 +11,7 @@ import SectionHeader, { Eyebrow } from "../../components/SectionHeader";
 import ServiceCard, { ServiceCardSkeleton } from "../../components/ServiceCard";
 import { EmptyState, ErrorState } from "../../components/States";
 import TestimonialCard from "../../components/TestimonialCard";
+import { STEPS } from "../../content/method";
 import { useCompany } from "../../context/CompanyContext";
 import useApi from "../../hooks/useApi";
 
@@ -174,12 +175,6 @@ function FeaturedServices({ state }) {
 
 /* --- Méthode de travail ----------------------------------------------------------- */
 
-const STEPS = [
-  ["Écoute et visite", "Nous analysons votre besoin et, si nécessaire, nous nous déplaçons sur le site."],
-  ["Étude et devis", "Vous recevez une proposition technique et un devis détaillé, poste par poste."],
-  ["Réalisation", "Nos équipes interviennent, coordonnées par un responsable unique."],
-  ["Réception et suivi", "Nous vérifions l'ouvrage avec vous et restons disponibles après la livraison."],
-];
 
 function Method() {
   const [ref, inView] = useInView();
