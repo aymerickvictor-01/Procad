@@ -3,7 +3,7 @@
 /*
  * Système de design PROCAD, aux couleurs du logo :
  * bleu PROCAD (#0000FF, légèrement approfondi pour la lisibilité), rouge PROCAD en accent,
- * surfaces sombres bleu marine, angles sobres, trame de plan technique.
+ * surfaces sombres bleu marine, angles sobres, photos de chantier voilées en fond d'en-tête.
  */
 @theme {
   --font-sans: "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -73,14 +73,6 @@
 @utility glass {
   background-color: rgb(255 255 255 / 0.04);
   border: 1px solid rgb(255 255 255 / 0.1);
-}
-
-/* Trame de plan technique (quadrillage léger) pour les fonds sombres */
-@utility bg-blueprint {
-  background-image:
-    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px);
-  background-size: 32px 32px;
 }
 
 /* Filet horizontal fin */

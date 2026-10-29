@@ -21,6 +21,7 @@ export default function About() {
         title={`À propos de ${company.name}`}
         description={company.slogan}
         breadcrumb={[{ to: "/", label: "Accueil" }, { label: "À propos" }]}
+        image={company.hero_image || "/images/fonds/a-propos.jpg"}
       />
 
       <section className="py-12 sm:py-16">

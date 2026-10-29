@@ -81,6 +81,7 @@ export default function Contact() {
         title="Parlons de votre projet"
         description="Une question, une demande de devis ? Remplissez le formulaire, nous vous répondons dans les meilleurs délais."
         breadcrumb={[{ to: "/", label: "Accueil" }, { label: "Contact" }]}
+        image="/images/fonds/contact.jpg"
       />
 
       <section className="py-12 sm:py-16">

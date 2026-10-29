@@ -6,6 +6,7 @@ import { errorMessage } from "../../api/client";
 import Button from "../../components/Button";
 import Field, { inputClass } from "../../components/form/Field";
 import Logo from "../../components/Logo";
+import { PhotoBackground } from "../../components/PageHero";
 import { Eyebrow } from "../../components/SectionHeader";
 import { useAuth } from "../../context/AuthContext";
 import { useCompany } from "../../context/CompanyContext";
@@ -57,8 +58,8 @@ export default function AdminLogin() {
       <meta name="robots" content="noindex" />
 
       {/* Panneau de marque */}
-      <div className="relative hidden overflow-hidden border-r-4 border-accent bg-night p-12 text-ink lg:flex lg:flex-col lg:justify-between">
-        <div aria-hidden="true" className="bg-blueprint absolute inset-0" />
+      <div className="relative isolate hidden overflow-hidden border-r-4 border-accent bg-night p-12 text-ink lg:flex lg:flex-col lg:justify-between">
+        <PhotoBackground image="/images/fonds/accueil.jpg" />
         <Logo framed className="relative self-start" imageClassName="h-16" />
         <div className="relative">
           <Eyebrow dark>Espace d'administration</Eyebrow>

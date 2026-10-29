@@ -164,6 +164,7 @@ export default function ServiceDetail() {
         title={service?.title ?? "Chargement…"}
         description={service?.short_description}
         breadcrumb={breadcrumb}
+        image={service?.cover_image || "/images/fonds/services.jpg"}
       />
 
       {detail.loading ? (

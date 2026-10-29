@@ -89,6 +89,7 @@ export default function Services() {
         title="Nos services"
         description="Parcourez l'ensemble de nos prestations, filtrez par domaine ou recherchez un service précis."
         breadcrumb={[{ to: "/", label: "Accueil" }, { label: "Services" }]}
+        image="/images/fonds/services.jpg"
       />
 
       <section className="py-12 sm:py-16">

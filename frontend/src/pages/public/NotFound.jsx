@@ -2,12 +2,13 @@ import { ArrowLeft } from "lucide-react";
 
 import Button from "../../components/Button";
 import Container from "../../components/Container";
+import { PhotoBackground } from "../../components/PageHero";
 import { Eyebrow } from "../../components/SectionHeader";
 
 export default function NotFound({ title = "Page introuvable", message }) {
   return (
-    <section className="relative overflow-hidden bg-night text-ink">
-      <div aria-hidden="true" className="bg-blueprint absolute inset-0" />
+    <section className="relative isolate overflow-hidden bg-night text-ink">
+      <PhotoBackground image="/images/fonds/erreur.jpg" />
       <Container className="relative flex min-h-[60vh] flex-col justify-center py-24">
         <title>{title}</title>
         <Eyebrow dark>Erreur 404</Eyebrow>

@@ -9,10 +9,19 @@ from .models import Category, Service, ServiceFeature, ServiceImage
 
 class CategorySerializer(BaseModelSerializer):
     service_count = serializers.IntegerField(read_only=True, help_text="Nombre de services publiés.")
+    image = serializers.SerializerMethodField(
+        help_text="Couverture du premier service publié de la catégorie (illustration), ou null."
+    )
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "description", "service_count"]
+        fields = ["id", "name", "slug", "description", "service_count", "image"]
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_image(self, category):
+        # Liste préchargée par CategoryListView (services publiés avec couverture, dans l'ordre).
+        services = category.illustrated_services
+        return services[0].cover_image.url if services else None
 
 
 class CategoryRefSerializer(BaseModelSerializer):

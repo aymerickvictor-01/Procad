@@ -28,12 +28,23 @@ export function Breadcrumb({ items }) {
   );
 }
 
-/** En-tête sombre des pages intérieures. */
-export default function PageHero({ eyebrow, title, description, breadcrumb, children }) {
+/** Photo de fond voilée de bleu marine : plus sombre à gauche, là où se trouve le texte. */
+export function PhotoBackground({ image, className = "" }) {
   return (
-    <section className="relative overflow-hidden bg-night text-ink">
-      <div aria-hidden="true" className="bg-blueprint absolute inset-0 [mask-image:linear-gradient(to_right,black,transparent_85%)]" />
-      <Container className="relative py-12 sm:py-16">
+    <div aria-hidden="true" className={`absolute inset-0 -z-10 ${className}`}>
+      {image && <img src={image} alt="" className="size-full object-cover" />}
+      <div className="absolute inset-0 bg-gradient-to-r from-night/95 via-night/75 to-night/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-night/60 to-transparent" />
+    </div>
+  );
+}
+
+/** En-tête des pages intérieures, sur photo. */
+export default function PageHero({ eyebrow, title, description, breadcrumb, image = "/images/fonds/pages.jpg", children }) {
+  return (
+    <section className="relative isolate overflow-hidden border-b-4 border-accent bg-night text-ink">
+      <PhotoBackground image={image} />
+      <Container className="relative py-14 sm:py-20">
         {breadcrumb && <Breadcrumb items={breadcrumb} />}
         {eyebrow && (
           <Eyebrow dark className="mt-8">

@@ -1,4 +1,4 @@
-from django.db.models import Count, ProtectedError, Q
+from django.db.models import Count, Prefetch, ProtectedError, Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -24,9 +24,17 @@ class CategoryListView(generics.ListAPIView):
     # Peu nombreuses et affichées en entier (onglets de filtre) : pas de pagination.
     pagination_class = None
     # order_by explicite : Django n'applique pas Meta.ordering aux requêtes avec agrégat (Count).
-    queryset = Category.objects.annotate(
-        service_count=Count("services", filter=Q(services__is_published=True))
-    ).order_by("display_order", "name")
+    queryset = (
+        Category.objects.annotate(service_count=Count("services", filter=Q(services__is_published=True)))
+        .prefetch_related(
+            Prefetch(
+                "services",
+                queryset=Service.objects.published().exclude(cover_image="").order_by("display_order", "title"),
+                to_attr="illustrated_services",
+            )
+        )
+        .order_by("display_order", "name")
+    )
 
 
 @extend_schema(tags=["Public"])

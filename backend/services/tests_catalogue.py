@@ -71,3 +71,10 @@ class LoadCatalogueCommandTests(TestCase):
         self.assertEqual(service.title, "Étanchéité à chaud et à froid")
         # La publication reste un choix de l'administrateur, même avec --update.
         self.assertFalse(service.is_published)
+
+    def test_categories_api_returns_an_illustration(self):
+        self.load()
+        Service.objects.filter(category__slug="etudes-conception").update(is_published=False)
+        categories = {c["slug"]: c for c in self.client.get("/api/categories/").json()}
+        self.assertIsNone(categories["etudes-conception"]["image"])
+        self.assertTrue(categories["construction-gros-oeuvre"]["image"].startswith("/media/"))
