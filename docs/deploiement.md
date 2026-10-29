@@ -73,6 +73,7 @@ Laisser `NGINX_CONFIG=http-only` pour l'instant, puis démarrer :
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 docker compose -f docker-compose.prod.yml exec backend python manage.py createsuperuser
+docker compose -f docker-compose.prod.yml exec backend python manage.py load_catalogue
 ```
 
 Le site public répond alors en HTTP sur http://procad.com. La connexion à l'administration ne

@@ -412,7 +412,12 @@ export default function ServiceForm() {
               >
                 {(props) => <textarea {...props} rows={2} className={`${inputClass} resize-none`} value={values.short_description} onChange={set("short_description")} />}
               </Field>
-              <Field label="Description complète" required error={errors.description}>
+              <Field
+                label="Description complète"
+                required
+                error={errors.description}
+                hint="Laisser une ligne vide entre deux paragraphes. Une ligne commençant par « - » s'affiche en liste à puces."
+              >
                 {(props) => <textarea {...props} rows={9} className={`${inputClass} resize-y`} value={values.description} onChange={set("description")} />}
               </Field>
             </div>

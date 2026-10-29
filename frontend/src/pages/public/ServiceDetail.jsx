@@ -57,6 +57,38 @@ function Gallery({ service }) {
   );
 }
 
+// Texte saisi dans l'administration : paragraphes séparés par une ligne vide,
+// lignes commençant par « - » ou « – » affichées en liste à puces.
+const BULLET = /^\s*[-–•]\s+/;
+
+function Description({ text }) {
+  return text.split(/\n\s*\n/).map((block, index) => {
+    const lines = block.split("\n").filter((line) => line.trim());
+    const bullets = lines.filter((line) => BULLET.test(line));
+    if (!bullets.length) {
+      return (
+        <p key={index} className="mt-4 whitespace-pre-line">
+          {block.trim()}
+        </p>
+      );
+    }
+    const intro = lines.filter((line) => !BULLET.test(line)).join("\n");
+    return (
+      <div key={index} className="mt-4">
+        {intro && <p className="font-semibold text-gray-900">{intro}</p>}
+        <ul className="mt-3 space-y-2">
+          {bullets.map((line) => (
+            <li key={line} className="flex gap-3">
+              <span className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+              <span>{line.replace(BULLET, "").replace(/\s*[;.]$/, "")}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  });
+}
+
 function ContactPanel({ service, company }) {
   return (
     <aside className="rounded-xl border border-gray-200 bg-white p-6 shadow-card lg:sticky lg:top-28">
@@ -149,9 +181,9 @@ export default function ServiceDetail() {
 
                 <div className="mt-10">
                   <h2 className="text-2xl font-bold tracking-[-0.02em] text-gray-900">Présentation</h2>
-                  <p className="mt-4 text-[17px] leading-relaxed whitespace-pre-line text-gray-700">
-                    {service.description}
-                  </p>
+                  <div className="text-[17px] leading-relaxed text-gray-700">
+                    <Description text={service.description} />
+                  </div>
                 </div>
 
                 {service.features.length > 0 && (

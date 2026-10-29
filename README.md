@@ -39,8 +39,8 @@ Seul **Docker Desktop** est nécessaire (Python, Node.js et PostgreSQL tournent 
    - **Linux / macOS** : `scripts/installer.sh`.
 
 Le script vérifie Docker, crée le fichier `.env` avec des mots de passe aléatoires, construit et
-démarre les conteneurs (base migrée automatiquement), propose de charger les données de
-démonstration et de créer le compte administrateur, puis affiche les adresses ci-dessous.
+démarre les conteneurs (base migrée automatiquement), charge le catalogue des services PROCAD
+et propose de créer le compte administrateur, puis affiche les adresses ci-dessous.
 La première installation télécharge environ 1,5 Go : compter 10 à 20 minutes selon la connexion.
 Il peut être relancé sans risque (le `.env` et les données existants sont conservés).
 
@@ -84,7 +84,19 @@ PROCAD_COMPOSE="docker compose" scripts/restore.sh backups/AAAA-MM-JJ_HHMMSS
 docker compose exec backend python manage.py test
 ```
 
-### Données de démonstration (développement)
+### Catalogue des services
+
+```bash
+docker compose exec backend python manage.py load_catalogue           # crée ce qui manque
+docker compose exec backend python manage.py load_catalogue --update  # remet les textes du catalogue
+```
+
+Les 19 métiers du document « SERVICES » de PROCAD, regroupés en 7 domaines et 15 services, avec
+textes, points forts et photos (`backend/services/catalogue/`). Sans `--update`, les services
+déjà présents ne sont jamais modifiés : les corrections faites dans l'administration sont
+conservées. À lancer aussi sur le serveur après la mise en ligne.
+
+### Données de démonstration (tests uniquement)
 
 ```bash
 docker compose exec backend python manage.py seed_demo          # crée ou recrée la démo
@@ -94,7 +106,7 @@ docker compose exec backend python manage.py seed_demo --reset  # supprime la d�
 Crée 3 catégories, 7 services (dont 1 brouillon) avec images, 4 témoignages et 3 messages, tous
 marqués « (démo) ». `--reset` ne supprime **que** ces données : le contenu réel saisi par
 l'administrateur et le profil de l'entreprise ne sont jamais touchés. Refusé si `DJANGO_DEBUG=0`
-(sauf `--force`). À lancer avec `--reset` avant de saisir le vrai contenu.
+(sauf `--force`). Ne pas mélanger avec le catalogue réel : `--reset` après les essais.
 
 ### Tests de bout en bout (navigateur)
 

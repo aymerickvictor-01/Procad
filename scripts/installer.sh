@@ -2,8 +2,7 @@
 # Installation de l'environnement de développement sur un nouvel ordinateur (Linux, macOS).
 # Sous Windows, utiliser plutôt installer.cmd (à la racine du projet).
 #
-#   scripts/installer.sh            # questions posées pour la démo et le compte administrateur
-#   scripts/installer.sh --demo     # charge les données de démonstration sans demander
+#   scripts/installer.sh
 #
 # Relançable sans risque : un .env existant est conservé, les données ne sont jamais effacées.
 set -euo pipefail
@@ -60,16 +59,10 @@ wait_for "http://localhost:$BACKEND_PORT/api/health/" 600 \
 
 manage() { docker compose exec -T backend python manage.py "$@"; }
 
-# --- 4. Données de démonstration --------------------------------------------------
-load_demo=n
-if [ "${1:-}" = "--demo" ]; then
-    load_demo=o
-elif [ -t 0 ]; then
-    read -r -p "Charger les données de démonstration (services, témoignages fictifs) ? [o/N] " load_demo
-fi
-case "$load_demo" in
-    [oOyY]*) say "Chargement des données de démonstration"; manage seed_demo ;;
-esac
+# --- 4. Catalogue des services ---------------------------------------------------
+# Services réels de PROCAD ; les services déjà présents ne sont pas modifiés.
+say "Chargement du catalogue des services"
+manage load_catalogue
 
 # --- 5. Compte administrateur -----------------------------------------------------
 has_admin=$(manage shell -v 0 -c \

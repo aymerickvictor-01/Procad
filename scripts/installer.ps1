@@ -1,10 +1,8 @@
 ﻿# Installation de l'environnement de développement sur un nouvel ordinateur Windows.
 # Lancer installer.cmd (double-clic, à la racine du projet), ou dans PowerShell :
-#   powershell -ExecutionPolicy Bypass -File scripts\installer.ps1 [-Demo]
+#   powershell -ExecutionPolicy Bypass -File scripts\installer.ps1
 #
 # Relançable sans risque : un .env existant est conservé, les données ne sont jamais effacées.
-param([switch]$Demo)
-
 # « Continue » : avec « Stop », PowerShell 5.1 transforme en erreur fatale le moindre message de
 # Docker sur la sortie d'erreur. Chaque commande est vérifiée par son code de retour.
 $ErrorActionPreference = "Continue"
@@ -84,16 +82,10 @@ if (-not (Wait-Url "http://localhost:$backendPort/api/health/" 600)) {
     Fail "L'API ne répond pas. Voir : docker compose logs backend"
 }
 
-# --- 4. Données de démonstration --------------------------------------------------
-$loadDemo = $Demo.IsPresent
-if (-not $loadDemo) {
-    $answer = Read-Host "Charger les données de démonstration (services, témoignages fictifs) ? [o/N]"
-    $loadDemo = $answer -match "^[oOyY]"
-}
-if ($loadDemo) {
-    Say "Chargement des données de démonstration"
-    docker compose exec -T backend python manage.py seed_demo
-}
+# --- 4. Catalogue des services ---------------------------------------------------
+# Services réels de PROCAD ; les services déjà présents ne sont pas modifiés.
+Say "Chargement du catalogue des services"
+docker compose exec -T backend python manage.py load_catalogue
 
 # --- 5. Compte administrateur -----------------------------------------------------
 $check = 'from django.contrib.auth import get_user_model as U; print(U().objects.filter(is_superuser=True).exists())'
